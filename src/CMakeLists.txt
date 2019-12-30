@@ -7,11 +7,11 @@
 ##==================================================================================================
 
 add_library ( mupp
-#               # game.cpp
-#               # screen/logo.cpp
-#               # media/image.cpp
-#               # media/music_queue.cpp
-#               # factory/screen_bank.cpp
+              session.cpp
+              # screen/logo.cpp
+              # media/image.cpp
+              # media/music_queue.cpp
+              # factory/screen_bank.cpp
             )
 
 if( MSVC )

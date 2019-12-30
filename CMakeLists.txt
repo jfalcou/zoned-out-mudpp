@@ -27,13 +27,12 @@ endif()
 option( MUPP_BUILD_TEST  "Build tests for mupp" ON  )
 message( STATUS "[mupp] Building ${CMAKE_BUILD_TYPE} mode with: ${CMAKE_CXX_FLAGS}")
 
-
-
 ## =================================================================================================
 ## Dependencies
 ## =================================================================================================
-find_package(Lua "5.3" EXACT REQUIRED)
-message(STATUS "[mupp] - Found LUA in ${LUA_INCLUDE_DIR}")
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads              REQUIRED        )
+find_package(Lua    "5.3"   EXACT REQUIRED        )
 
 include(download)
 

@@ -13,8 +13,6 @@ include(add_parent_target)
 ## Centralize all required setup for unit tests
 ##==================================================================================================
 function(add_demo root)
-  message(STATUS "YO FROM ${LUA_INCLUDE_DIR}")
-
   if( MSVC )
     set( options /std:c++latest -W3 -EHsc)
   else()
@@ -49,8 +47,9 @@ function(add_demo root)
                               )
 
     target_link_libraries ( ${test}
-                            #mupp
+                            mupp
                             ${MUPP_LIBRARIES}
+                            Threads::Threads
                           )
 
     add_dependencies(demo ${test})
