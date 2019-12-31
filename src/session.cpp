@@ -6,8 +6,8 @@
 
 namespace mudpp
 {
-  session::session(boost::asio::io_service& io)
-          : ios_(io), socket_(io), connection_status_(true)
+  session::session(boost::asio::io_service& io, session_manager* parent)
+          : manager_(parent), ios_(io), socket_(io), connection_status_(true)
   {
   }
 
@@ -32,9 +32,9 @@ namespace mudpp
           std::cout << "CONNECTION QUITTING : " << socket_.native_handle() << "\n";
           connection_status_ = false;
         }
-        if(cmd == "/reboot")
+        if(cmd == "/shutdown")
         {
-          std::cout << "SERVER QUITTING : \n";
+          std::cout << "SERVER SHUTDOWN : \n";
           ios_.stop();
         }
         else

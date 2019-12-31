@@ -16,10 +16,12 @@
 
 namespace mudpp
 {
+  class session_manager;
+
   class session
   {
     public:
-    session(boost::asio::io_service& io_service);
+    session(boost::asio::io_service& io_service, session_manager* parent);
 
     boost::asio::ip::tcp::socket&        socket()        { return socket_; }
     boost::asio::ip::tcp::socket const&  socket() const  { return socket_; }
@@ -33,6 +35,7 @@ namespace mudpp
     void handle_read  ( const boost::system::error_code& error, std::size_t bytes_transferred);
     void handle_write ( const boost::system::error_code& error);
 
+    session_manager*              manager_;
     boost::asio::io_service&      ios_;
     boost::asio::ip::tcp::socket  socket_;
     bool                          connection_status_;
@@ -40,7 +43,7 @@ namespace mudpp
   };
 
   // Local using for session resource pointer
-  using connection_t = std::unique_ptr<session>;
+  using session_t = std::unique_ptr<session>;
 }
 
 #endif
