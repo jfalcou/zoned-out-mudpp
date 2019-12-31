@@ -12,25 +12,29 @@
 
 #include <mudpp/system/periodic_event.hpp>
 #include <mudpp/system/session.hpp>
-#include <boost/asio.hpp>
-#include <memory>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <vector>
 
 namespace mudpp
 {
   class session_manager
-{
-  public:
-  session_manager(boost::asio::io_service& io_service, uint16_t port);
+  {
+    public:
+    session_manager(boost::asio::io_service& io, int port);
 
-  private:
-  void start_accept();
+    private:
+    using endpoint_t = boost::asio::ip::tcp::endpoint;
 
-  boost::asio::io_service&              io_service;
-  boost::asio::ip::tcp::acceptor        acceptor;
-  periodic_event                        event;
-  std::vector<std::unique_ptr<session>> sessions;
-};
+    void accept();
+    void cleanup();
+    void stats();
+
+    boost::asio::io_service&        ios_;
+    boost::asio::ip::tcp::acceptor  acceptor_;
+    std::vector<periodic_event_t>   events_;
+    std::vector<session_t>          sessions_;
+  };
 }
 
 #endif
