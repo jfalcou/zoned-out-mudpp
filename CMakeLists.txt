@@ -44,6 +44,13 @@ download_project( PROJ                sol
                   #QUIET
                 )
 
+download_project( PROJ                tabulate
+                  GIT_REPOSITORY      https://github.com/p-ranav/tabulate.git
+                  GIT_TAG             master
+                  "UPDATE_DISCONNECTED 1"
+                  #QUIET
+                )
+
 set(MUPP_LIBRARIES ${LUA_LIBRARIES} ${Boost_LIBRARIES})
 
 ## =================================================================================================

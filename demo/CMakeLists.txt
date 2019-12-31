@@ -6,5 +6,6 @@
 ##  SPDX-License-Identifier: MIT
 ##==================================================================================================
 
-add_demo( "mupp" deps/lua.cpp   )
-add_demo( "mupp" system/session.cpp   )
+add_demo( "mupp" deps/tabulate.cpp  )
+add_demo( "mupp" deps/lua.cpp       )
+add_demo( "mupp" system/session.cpp )

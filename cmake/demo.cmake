@@ -41,6 +41,7 @@ function(add_demo root)
     target_include_directories( ${test}
                                 PRIVATE
                                 ${sol_SOURCE_DIR}/include
+                                ${tabulate_SOURCE_DIR}/include
                                 ${PROJECT_SOURCE_DIR}/demo
                                 ${PROJECT_SOURCE_DIR}/include
                                 ${LUA_INCLUDE_DIR}

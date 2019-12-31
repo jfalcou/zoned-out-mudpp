@@ -24,6 +24,7 @@ target_include_directories(mupp
     PRIVATE
         ${PROJECT_SOURCE_DIR}/src
         ${sol_SOURCE_DIR}/include
+        ${tabulate_SOURCE_DIR}/include
         ${LUA_INCLUDE_DIR}
         ${Boost_INCLUDE_DIR}
 )
