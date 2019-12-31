@@ -10,9 +10,11 @@
 #ifndef MUDPP_SYSTEM_SESSION_HPP_INCLUDED
 #define MUDPP_SYSTEM_SESSION_HPP_INCLUDED
 
-#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <memory>
 #include <string>
+#include <array>
 
 namespace mudpp
 {
@@ -29,8 +31,6 @@ namespace mudpp
     void start();
     bool is_valid() const { return connection_status_; }
 
-    enum { max_length = 1024+2 };
-
     private:
     void handle_read  ( const boost::system::error_code& error, std::size_t bytes_transferred);
     void handle_write ( const boost::system::error_code& error);
@@ -39,7 +39,7 @@ namespace mudpp
     boost::asio::io_service&      ios_;
     boost::asio::ip::tcp::socket  socket_;
     bool                          connection_status_;
-    char data[max_length];
+    std::array<char,1026>         buffer_;
   };
 
   // Local using for session resource pointer
