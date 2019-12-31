@@ -7,19 +7,23 @@
   SPDX-License-Identifier: MIT
 **/
 //==================================================================================================
-#include <mudpp/io/session_manager.hpp>
+#include <mudpp/system/session_manager.hpp>
+#include <boost/asio.hpp>
 #include <iostream>
-#include <vector>
 
-int main(int argc, char *argv[])
+int main(int, char**)
 {
-  mudpp::session_manager s(4000);
+  boost::asio::io_service io_service;
 
-  do
+  try
   {
-    s.handle_connections  ();
-  }while(s.connection_count() < 10);
+    mudpp::session_manager ts(io_service, 4000 );
+    io_service.run();
+  }
+  catch (std::exception& e)
+  {
+    std::cerr << "TELNET SERVER ERROR: " << e.what() << std::endl;
+  }
 
   return 0;
 }
-

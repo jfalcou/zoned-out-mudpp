@@ -7,4 +7,4 @@
 ##==================================================================================================
 
 add_demo( "mupp" deps/lua.cpp   )
-add_demo( "mupp" io/session.cpp   )
+add_demo( "mupp" system/session.cpp   )

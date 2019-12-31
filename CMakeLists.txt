@@ -33,6 +33,7 @@ message( STATUS "[mupp] Building ${CMAKE_BUILD_TYPE} mode with: ${CMAKE_CXX_FLAG
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads              REQUIRED        )
 find_package(Lua    "5.3"   EXACT REQUIRED        )
+find_package(Boost "1.71"         REQUIRED system )
 
 include(download)
 
@@ -43,7 +44,7 @@ download_project( PROJ                sol
                   #QUIET
                 )
 
-set(MUPP_LIBRARIES ${LUA_LIBRARIES})
+set(MUPP_LIBRARIES ${LUA_LIBRARIES} ${Boost_LIBRARIES})
 
 ## =================================================================================================
 ## libmupp

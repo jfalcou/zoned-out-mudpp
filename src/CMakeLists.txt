@@ -8,10 +8,7 @@
 
 add_library ( mupp
               session.cpp
-              # screen/logo.cpp
-              # media/image.cpp
-              # media/music_queue.cpp
-              # factory/screen_bank.cpp
+              session_manager.cpp
             )
 
 if( MSVC )
@@ -28,6 +25,7 @@ target_include_directories(mupp
         ${PROJECT_SOURCE_DIR}/src
         ${sol_SOURCE_DIR}/include
         ${LUA_INCLUDE_DIR}
+        ${Boost_INCLUDE_DIR}
 )
 
 target_compile_options( mupp PRIVATE ${options} )
