@@ -10,15 +10,23 @@
 #ifndef MUDPP_ENGINE_GAME_HPP_INCLUDED
 #define MUDPP_ENGINE_GAME_HPP_INCLUDED
 
+#include <mudpp/system/session_manager.hpp>
+#include <boost/asio.hpp>
 
 namespace mudpp
 {
   struct game
   {
-    game(int port = 4000) : sessions_(4000) {}
+    game(int port = 4000) : sessions_(ios_,4000) {}
+
+    void run()
+    {
+      ios_.run();
+    }
 
     private:
-    mudpp::session_manager sessions_;
+    boost::asio::io_service ios_;
+    mudpp::session_manager  sessions_;
   };
 }
 
