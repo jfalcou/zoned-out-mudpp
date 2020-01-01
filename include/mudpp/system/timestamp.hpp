@@ -1,7 +1,7 @@
 //==================================================================================================
 /**
   MudPP - MUD engine for C++
-  Copyright 2019 Joel FALCOU
+  Copyright 2019-2020 Joel FALCOU
 
   Licensed under the MIT License <http://opensource.org/licenses/MIT>.
   SPDX-License-Identifier: MIT

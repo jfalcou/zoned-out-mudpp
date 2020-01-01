@@ -1,7 +1,7 @@
 //==================================================================================================
 /**
   MudPP - MUD engine for C++
-  Copyright 2019 Joel FALCOU
+  Copyright 2019-2020 Joel FALCOU
 
   Licensed under the MIT License <http://opensource.org/licenses/MIT>.
   SPDX-License-Identifier: MIT
@@ -12,16 +12,19 @@
 
 #include <mudpp/system/periodic_event.hpp>
 #include <mudpp/system/session.hpp>
-#include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <vector>
 
 namespace mudpp
 {
-  class session_manager
+  struct game;
+
+  struct session_manager
   {
     public:
-    session_manager(boost::asio::io_service& io, int port);
+    session_manager(game& g, int port);
+    void tick();
+    void broadcast( std::string const& msg);
 
     private:
     using endpoint_t = boost::asio::ip::tcp::endpoint;
@@ -30,9 +33,8 @@ namespace mudpp
     void cleanup();
     void stats();
 
-    boost::asio::io_service&        ios_;
+    game&                           game_context_;
     boost::asio::ip::tcp::acceptor  acceptor_;
-    std::vector<periodic_event_t>   events_;
     std::vector<session_t>          sessions_;
   };
 }

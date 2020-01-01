@@ -1,7 +1,7 @@
 //==================================================================================================
 /**
   MudPP - MUD engine for C++
-  Copyright 2019 Joel FALCOU
+  Copyright 2019-2020 Joel FALCOU
 
   Licensed under the MIT License <http://opensource.org/licenses/MIT>.
   SPDX-License-Identifier: MIT
@@ -18,28 +18,32 @@
 
 namespace mudpp
 {
-  class session_manager;
+  struct game;
 
-  class session
+  struct session
   {
     public:
-    session(boost::asio::io_service& io_service, session_manager* parent);
+    session(game& g);
 
     boost::asio::ip::tcp::socket&        socket()        { return socket_; }
     boost::asio::ip::tcp::socket const&  socket() const  { return socket_; }
 
     void start();
-    bool is_valid() const { return connection_status_; }
+    void tick();
+
+    void send( std::string const& msg ) { outgoing_message_ += msg;   }
+    bool is_valid() const               { return connection_status_;  }
 
     private:
-    void handle_read  ( const boost::system::error_code& error, std::size_t bytes_transferred);
-    void handle_write ( const boost::system::error_code& error);
+    void read ( const boost::system::error_code& error, std::size_t size);
+    void write( const boost::system::error_code& error, std::size_t size);
 
-    session_manager*              manager_;
-    boost::asio::io_service&      ios_;
+    game&                         game_context_;
     boost::asio::ip::tcp::socket  socket_;
     bool                          connection_status_;
-    std::array<char,1026>         buffer_;
+    std::array<char,512>          buffer_;
+    std::string                   incoming_message_;
+    std::string                   outgoing_message_;
   };
 
   // Local using for session resource pointer

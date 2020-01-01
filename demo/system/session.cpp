@@ -8,11 +8,10 @@
 **/
 //==================================================================================================
 #include <mudpp/engine/game.hpp>
-#include <iostream>
 
 int main(int, char**)
 {
-  mudpp::game g( 4000 );
+  mudpp::game g( 0.1, 4000 );
   g.run();
 
   return 0;

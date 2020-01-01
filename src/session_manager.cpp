@@ -1,27 +1,30 @@
 //==================================================================================================
 /**
   MudPP - MUD engine for C++
-  Copyright 2019 Joel FALCOU
+  Copyright 2019-2020 Joel FALCOU
 
   Licensed under the MIT License <http://opensource.org/licenses/MIT>.
   SPDX-License-Identifier: MIT
 **/
 //==================================================================================================
 #include <mudpp/system/session_manager.hpp>
+#include <mudpp/engine/game.hpp>
+#include <tabulate/termcolor.hpp>
 #include <iostream>
 #include <cstdint>
 #include <memory>
 
 namespace mudpp
 {
-  session_manager::session_manager(boost::asio::io_service& ios, int port)
-                  : ios_(ios), acceptor_(ios, endpoint_t(boost::asio::ip::tcp::v4(), port))
+  session_manager::session_manager(game& g, int port)
+                  : game_context_(g)
+                  , acceptor_(game_context_.io(), endpoint_t(boost::asio::ip::tcp::v4(), port))
   {
-    // Cleanup unused sessions every 5s
-    events_.push_back( periodic_event::make(ios_, 5000, [this]() { cleanup(); } ) );
+    // Cleanup unused sessions every 0.5s
+    game_context_.register_event( 500, [this]() { cleanup(); } );
 
-    // Prompt a stat of the server every 1s
-    events_.push_back( periodic_event::make(ios_, 1000, [this]() { stats();   } ) );
+    // Prompt a stat of the server every 5s
+    game_context_.register_event( 3000, [this]() { stats(); } );
 
     // Starts accepting sessions
     accept();
@@ -30,7 +33,7 @@ namespace mudpp
   void session_manager::accept()
   {
     // Make a new session
-    sessions_.push_back(std::make_unique<session>(ios_,this));
+    sessions_.push_back(std::make_unique<session>(game_context_));
 
     // Whenever something happens, start the session and wait for acceptance again
     acceptor_.async_accept( sessions_.back()->socket()
@@ -41,7 +44,7 @@ namespace mudpp
   // Go over every sessions and remove/erase all that are invalid
   void session_manager::cleanup()
   {
-    auto old_count = sessions_.size() - 1;
+    auto old_count = sessions_.size();
 
     sessions_.erase( std::remove_if ( sessions_.begin(), sessions_.end()
                                     , [](auto const& s) { return !s->is_valid(); }
@@ -49,14 +52,30 @@ namespace mudpp
                     , sessions_.end()
                     );
 
-    auto new_count = sessions_.size() - 1;
+    auto diff = old_count - sessions_.size();
 
-    std::cout << "[CLEANUP] - " << (old_count - new_count) << " sessions cleaned up.\n";
+    if(diff)
+      game_context_.log(std::cout,"NETWORK") << diff << " connections cleaned up." << std::endl;
   }
 
   // Live info display
   void session_manager::stats()
   {
-    std::cout << "[INFO] - " << sessions_.size()-1 << " alive sessions." << std::endl;
+    game_context_.log(std::cout,"NETWORK") << sessions_.size()-1 << " alive sessions." << std::endl;
+  }
+
+  // Publish a *tick* to all player
+  void session_manager::tick()
+  {
+    for(auto& s : sessions_)
+      if(s->is_valid())
+        s->tick();
+  }
+
+  void session_manager::broadcast(std::string const& msg)
+  {
+    for(auto& s : sessions_)
+      if(s->is_valid())
+        s->send(msg);
   }
 }
