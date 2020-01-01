@@ -8,7 +8,9 @@
 **/
 //==================================================================================================
 #include <mudpp/engine/game.hpp>
+#include <mudpp/engine/player.hpp>
 #include <mudpp/system/timestamp.hpp>
+#include <mudpp/system/session.hpp>
 #include <mudpp/system/io.hpp>
 #include <tabulate/termcolor.hpp>
 #include <boost/asio.hpp>
@@ -18,9 +20,13 @@
 namespace mudpp
 {
   game::game( double freq, int port )
-      : ios_(), events_(), sessions_(*this,4000)
+      : ios_()
+      , events_(), players_()
+      , sessions_(*this,4000)
       , frequency_(freq), elapsed_(0.0)
-  {}
+  {
+    lua_setup();
+  }
 
   void game::shutdown()
   {
@@ -29,6 +35,12 @@ namespace mudpp
 
     // Stop I/O processing
     ios_.stop();
+  }
+
+  void game::spawn_player(session& s)
+  {
+    players_.push_back( player::make(s) );
+    log(std::cout,"GAME") << "New player connected." << std::endl;
   }
 
   std::ostream& game::log(std::ostream& os, std::string const& context)
@@ -86,5 +98,20 @@ namespace mudpp
     log(std::cout,"GAME") << "Shutting down..." << std::endl;
 
     return true;
+  }
+
+  void game::lua_setup()
+  {
+    lua_state_.open_libraries ( sol::lib::base, sol::lib::io, sol::lib::string
+                              , sol::lib::math, sol::lib::os
+                              );
+
+    // Provide access to game::log from LUA
+    lua_state_.set_function ( "mudpp_log"
+                            , [&](std::string const& s) { log(std::cout,"LUA") << s << std::endl; }
+                            );
+
+    // Sanity check
+    lua_state_.script ( "mudpp_log('LUA engine started.')" );
   }
 }
