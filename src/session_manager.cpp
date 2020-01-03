@@ -24,7 +24,7 @@ namespace mudpp
     game_context_.register_event( 500, [this]() { cleanup(); } );
 
     // Prompt a stat of the server every 5s
-    game_context_.register_event( 3000, [this]() { stats(); } );
+    game_context_.register_event( 5000, [this]() { stats(); } );
 
     // Starts accepting sessions
     accept();
@@ -77,5 +77,7 @@ namespace mudpp
     for(auto& s : sessions_)
       if(s->is_valid())
         s->send(msg);
+
+    tick();
   }
 }

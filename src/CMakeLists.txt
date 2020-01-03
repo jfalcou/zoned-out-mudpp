@@ -8,6 +8,7 @@
 
 add_library ( mupp
               game.cpp
+              player.cpp
               session.cpp
               session_manager.cpp
             )

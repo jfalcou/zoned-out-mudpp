@@ -8,6 +8,7 @@
 **/
 //==================================================================================================
 #include <mudpp/system/session.hpp>
+#include <mudpp/engine/player.hpp>
 #include <mudpp/engine/game.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
@@ -16,7 +17,7 @@
 namespace mudpp
 {
   session::session(game& g)
-          : game_context_(g), socket_(g.io()), connection_status_(true)
+          : game_context_(g), active_player_(nullptr), socket_(g.io()), connection_status_(true)
   {
   }
 
@@ -32,14 +33,19 @@ namespace mudpp
     }
   }
 
+  void session::disconnect()
+  {
+    game_context_.log(std::cout,"NETWORK")  << "Session disconnected." << std::endl;
+    connection_status_ = false;
+  }
+
   void session::start()
   {
     game_context_.log(std::cout,"NETWORK")  << "Connection from: "
                                             << socket_.remote_endpoint() << std::endl;
 
     // Bind current session to a new player in game_context
-
-    // Ask for player ID and process login
+    active_player_ = game_context_.attach_player(*this);
 
     // Start input processing
     socket_.async_read_some ( boost::asio::buffer(buffer_.data(), buffer_.size())
@@ -71,30 +77,9 @@ namespace mudpp
         // Reshape remaining incoming message buffer
         incoming_message_ = incoming_message_.substr(i + 1);
 
+        // Do something with it
         game_context_.log(std::cout,"INPUT") << "Processing: '"<< line << "'" << std::endl;
-
-        // now, do something with it -> ProcessPlayerInput (this, Trim (line));
-        if(line == "/quit")
-        {
-          game_context_.log(std::cout,"NETWORK")  << "Connection from: "
-                                                  << socket_.remote_endpoint()
-                                                  << " disconnected." << std::endl;
-
-          connection_status_ = false;
-          outgoing_message_ += "Bye !!\n";
-        }
-        else if(line == "/shutdown")
-        {
-          game_context_.shutdown();
-        }
-        else if(line == "/hello")
-        {
-          outgoing_message_ += "Hello player !\n";
-        }
-        else
-        {
-          outgoing_message_ += "No comprendo senor!\n";
-        }
+        active_player_->process_input(line);
       }
 
       // Read next bits of data

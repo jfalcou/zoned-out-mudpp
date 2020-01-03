@@ -12,8 +12,9 @@
 
 #include <mudpp/system/session_manager.hpp>
 #include <mudpp/engine/player.hpp>
-#include <sol/sol.hpp>
 #include <boost/asio.hpp>
+#include <sol/sol.hpp>
+#include <vector>
 
 namespace mudpp
 {
@@ -23,10 +24,13 @@ namespace mudpp
   {
     game( double freq = 0.1, int port = 4000 );
 
-    void shutdown();
-    bool run();
+    std::ostream& log(std::ostream& os, std::string const& context);
 
-    void spawn_player(session&);
+    bool run();
+    void shutdown();
+
+    player* find_player(std::string const& name);
+    player* attach_player(session&);
 
     boost::asio::io_service& io() { return ios_; }
 
@@ -35,19 +39,18 @@ namespace mudpp
       events_.push_back( periodic_event::make(ios_, period, f) );
     }
 
-    std::ostream& log(std::ostream& os, std::string const& context);
-
     private:
 
     void lua_setup();
 
-    boost::asio::io_service       ios_;
-    std::vector<periodic_event_t> events_;
-    std::vector<player_t>         players_;
-    mudpp::session_manager        sessions_;
-    sol::state                    lua_state_;
-    double                        frequency_;
-    double                        elapsed_;
+    boost::asio::io_service                   ios_;
+    std::vector<periodic_event_t>             events_;
+    std::vector<player_t>                     players_;
+    mudpp::session_manager                    sessions_;
+    sol::state                                lua_state_;
+    double                                    frequency_;
+    double                                    elapsed_;
+    bool                                      shutdown_;
   };
 
 }

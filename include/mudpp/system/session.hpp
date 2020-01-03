@@ -19,6 +19,7 @@
 namespace mudpp
 {
   struct game;
+  struct player;
 
   struct session
   {
@@ -29,16 +30,20 @@ namespace mudpp
     boost::asio::ip::tcp::socket const&  socket() const  { return socket_; }
 
     void start();
+    void disconnect();
     void tick();
 
     void send( std::string const& msg ) { outgoing_message_ += msg;   }
     bool is_valid() const               { return connection_status_;  }
+
+    game& context() { return game_context_; }
 
     private:
     void read ( const boost::system::error_code& error, std::size_t size);
     void write( const boost::system::error_code& error, std::size_t size);
 
     game&                         game_context_;
+    player*                       active_player_;
     boost::asio::ip::tcp::socket  socket_;
     bool                          connection_status_;
     std::array<char,512>          buffer_;

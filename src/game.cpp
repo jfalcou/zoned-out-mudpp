@@ -24,23 +24,14 @@ namespace mudpp
       , events_(), players_()
       , sessions_(*this,4000)
       , frequency_(freq), elapsed_(0.0)
+      , shutdown_(false)
   {
     lua_setup();
   }
 
   void game::shutdown()
   {
-    // Notify of shutdown
-    sessions_.broadcast(urgent("**Server is shutting down NOW!**"));
-
-    // Stop I/O processing
-    ios_.stop();
-  }
-
-  void game::spawn_player(session& s)
-  {
-    players_.push_back( player::make(s) );
-    log(std::cout,"GAME") << "New player connected." << std::endl;
+    shutdown_ = true;
   }
 
   std::ostream& game::log(std::ostream& os, std::string const& context)
@@ -55,15 +46,24 @@ namespace mudpp
     return os;
   }
 
+  player* game::find_player(std::string const& name)
+  {
+    auto p = std::find_if ( players_.begin(),players_.end()
+                          , [&](auto const& e) { return e->name() == name; }
+                          );
+
+    return (p != players_.end()) ? p->get() : nullptr;
+  }
+
   bool game::run()
   {
     log(std::cout,"GAME") << "Start..." << std::endl;
 
-    // Setup game events
-    register_event( 5000, [this, msg = info("**TICK**")]() { sessions_.broadcast(msg); } );
-
     // Start the game
     auto tic = std::chrono::steady_clock::now();
+
+    // Setup game events
+    register_event( 5000, [this]() { for(auto& p : players_) p->tick(); } );
 
     try
     {
@@ -85,7 +85,10 @@ namespace mudpp
           sessions_.tick();
         }
 
-      } while( !ios_.stopped() );
+      } while( !shutdown_ );
+
+      // Notify of shutdown
+      sessions_.broadcast(urgent("**Server is shutting down NOW!**"));
     }
     catch(std::exception& e)
     {
@@ -113,5 +116,12 @@ namespace mudpp
 
     // Sanity check
     lua_state_.script ( "mudpp_log('LUA engine started.')" );
+  }
+
+  player* game::attach_player(session& s)
+  {
+    log(std::cout,"GAME") << "New player connected." << std::endl;
+    players_.push_back(player::make(s));
+    return players_.back().get();
   }
 }
