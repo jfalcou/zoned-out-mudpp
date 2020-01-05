@@ -25,13 +25,13 @@ namespace mudpp
     session_manager(game& g, int port);
     void tick();
     void broadcast( std::string const& msg);
+    void cleanup();
+    void stats();
 
     private:
     using endpoint_t = boost::asio::ip::tcp::endpoint;
 
     void accept();
-    void cleanup();
-    void stats();
 
     game&                           game_context_;
     boost::asio::ip::tcp::acceptor  acceptor_;

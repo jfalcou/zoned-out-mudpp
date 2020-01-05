@@ -15,6 +15,7 @@
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
 #include <vector>
+#include <map>
 
 namespace mudpp
 {
@@ -22,17 +23,23 @@ namespace mudpp
 
   struct game
   {
-    game( double freq = 0.1, int port = 4000 );
+    game( std::string const& config_file );
 
     std::ostream& log(std::ostream& os, std::string const& context);
 
     bool run();
     void shutdown();
 
+
     player* find_player(std::string const& name);
     player* attach_player(session&);
 
-    boost::asio::io_service& io() { return ios_; }
+    std::map<std::string,std::string>&  strings()       { return messages_.value();   }
+    sol::state&                         script_engine() { return lua_state_;  }
+    boost::asio::io_service&            io()            { return ios_;        }
+    std::map<std::string,std::string>&  paths()         { return paths_.value(); }
+
+    bool exists( player const& p);
 
     template<typename Function> void register_event(int period, Function f)
     {
@@ -42,15 +49,17 @@ namespace mudpp
     private:
 
     void lua_setup();
+    void cleanup();
 
-    boost::asio::io_service                   ios_;
-    std::vector<periodic_event_t>             events_;
-    std::vector<player_t>                     players_;
-    mudpp::session_manager                    sessions_;
-    sol::state                                lua_state_;
-    double                                    frequency_;
-    double                                    elapsed_;
-    bool                                      shutdown_;
+    boost::asio::io_service                         ios_;
+    std::vector<periodic_event_t>                   events_;
+    std::vector<player_t>                           players_;
+    sol::nested<std::map<std::string, std::string>> paths_;
+    sol::nested<std::map<std::string, std::string>> messages_;
+    std::unique_ptr<mudpp::session_manager>         sessions_;
+    sol::state                                      lua_state_;
+    int                                             period_;
+    bool                                            shutdown_;
   };
 
 }

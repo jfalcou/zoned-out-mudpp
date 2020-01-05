@@ -19,19 +19,35 @@
 
 namespace mudpp
 {
-  game::game( double freq, int port )
-      : ios_()
-      , events_(), players_()
-      , sessions_(*this,4000)
-      , frequency_(freq), elapsed_(0.0)
-      , shutdown_(false)
+  game::game( std::string const& config_file )
+      : ios_(), events_(), players_(), shutdown_(false)
   {
     lua_setup();
+
+    // Read config
+    lua_state_.script_file(config_file.c_str());
+    paths_      = lua_state_["path"];
+    period_  = lua_state_["base_period"];
+    int port    = lua_state_["port"];
+
+    // Build session
+    sessions_ = std::make_unique<session_manager>(*this,port);
+
+    // Read messages
+    lua_state_.script_file( paths_.value()["strings"].c_str());
+    messages_ = lua_state_["messages"];
   }
 
   void game::shutdown()
   {
     shutdown_ = true;
+  }
+
+  bool game::exists( player const& p)
+  {
+    return std::find_if ( players_.begin(), players_.end()
+                        , [&](auto const& e) { return e->name() == p.name() && e->is_logged(); }
+                        ) != players_.end();
   }
 
   std::ostream& game::log(std::ostream& os, std::string const& context)
@@ -59,36 +75,42 @@ namespace mudpp
   {
     log(std::cout,"GAME") << "Start..." << std::endl;
 
-    // Start the game
-    auto tic = std::chrono::steady_clock::now();
-
     // Setup game events
-    register_event( 5000, [this]() { for(auto& p : players_) p->tick(); } );
+    register_event( lua_state_["tick_period"], [this]() { for(auto& p : players_) p->tick(); } );
+
+    // Cleanup resources
+    register_event( lua_state_["cleanup_period"], [this]() { cleanup(); } );
+
+    // Display network stats
+    register_event( lua_state_["stats_period"], [this]() { sessions_->stats(); } );
 
     try
     {
+      // Start the game
+      auto tic = std::chrono::high_resolution_clock::now();
+
       do
       {
         // Process message if any
         ios_.poll();
 
         // Check if it's time to update the game
-        auto toc = std::chrono::steady_clock::now();
-        elapsed_ = (toc - tic).count();
+        auto toc = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> elapsed = toc - tic;
 
-        if(elapsed_ > frequency_)
+        if(elapsed.count() > period_)
         {
           tic = toc;
           // Update game state
 
           // Propagate updates through all open sessions
-          sessions_.tick();
+          sessions_->tick();
         }
 
       } while( !shutdown_ );
 
       // Notify of shutdown
-      sessions_.broadcast(urgent("**Server is shutting down NOW!**"));
+      sessions_->broadcast(urgent("**Server is shutting down NOW!**"));
     }
     catch(std::exception& e)
     {
@@ -101,6 +123,25 @@ namespace mudpp
     log(std::cout,"GAME") << "Shutting down..." << std::endl;
 
     return true;
+  }
+
+  // Go over every sessions and remove/erase all that are invalid
+  void game::cleanup()
+  {
+    auto old_count = players_.size();
+
+    players_.erase( std::remove_if ( players_.begin(), players_.end()
+                                    , [](auto const& s) { return !s->is_connected(); }
+                                    )
+                    , players_.end()
+                    );
+
+    auto diff = old_count - players_.size();
+
+    if(diff)
+      log(std::cout,"GAME") << diff << " players cleaned up." << std::endl;
+
+    sessions_->cleanup();
   }
 
   void game::lua_setup()

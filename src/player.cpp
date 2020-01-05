@@ -13,6 +13,8 @@
 #include <mudpp/system/io.hpp>
 #include <tabulate/termcolor.hpp>
 #include <tabulate/table.hpp>
+#include <fstream>
+#include <filesystem>
 
 namespace mudpp
 {
@@ -21,7 +23,25 @@ namespace mudpp
         , game_context_(s.context())
         , current_state_(state::login)
   {
-    banner();
+    auto b = box_message( {"@", tabulate::Color::yellow}
+                        , {"¤", tabulate::Color::yellow}
+                        , {{tabulate::FontStyle::bold},tabulate::Color::red,tabulate::FontAlign::center}
+                        , 100
+                        , game_context_.strings()["welcome"]
+                        //"Welcome to Mud++\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n\nCopyright 2020 Joel FALCOU"
+                        );
+
+    send(b);
+    login_prompt();
+  }
+
+  player_t player::make(session& s)
+  {
+    return std::make_unique<player>(s);
+  }
+
+  void player::login_prompt()
+  {
     std::ostringstream os;
     os  << termcolor::colorize << termcolor::white << "Would you want to "
         << termcolor::bold << "[" << termcolor::yellow << "L" << termcolor::white << "]oad"
@@ -33,11 +53,6 @@ namespace mudpp
     session_.send(os.str());
   }
 
-  player_t player::make(session& s)
-  {
-    return std::make_unique<player>(s);
-  }
-
   void player::process_input(std::string const& input)
   {
     switch(current_state_)
@@ -45,13 +60,20 @@ namespace mudpp
       case state::login:  current_state_ = process_login(input);
                           break;
 
-      case state::play:   current_state_ = play(input);
-                          break;
-
       case state::new_player: current_state_ = create_player(input);
                               break;
 
-      case state::disconnected: break;
+      case state::ask_password: current_state_ = ask_password(input);
+                              break;
+
+      case state::load_player: current_state_ = load_player(input);
+                              break;
+
+      case state::check_password: current_state_ = check_password(input);
+                                  break;
+
+      case state::play:   current_state_ = play(input);
+                          break;
 
       default:  break;
     }
@@ -61,40 +83,25 @@ namespace mudpp
 
   void player::tick() { if(current_state_ == state::play) send(info("**TICK**")); }
 
-  // Display the banner to current player
-  void player::banner()
-  {
-    tabulate::Table banner_;
-
-    banner_ .format()
-            .width(80)
-            .multi_byte_characters(true)
-            .font_style({tabulate::FontStyle::bold})
-            .font_color(tabulate::Color::red)
-            .font_align(tabulate::FontAlign::center)
-            .corner("ᛰ")
-            .corner_color(tabulate::Color::yellow)
-            .border("ᛟ")
-            .border_color(tabulate::Color::yellow);
-
-    banner_.add_row({" "});
-    banner_.add_row({"Welcome to Mud++"});
-    banner_[1].format().hide_border_top();
-    banner_.add_row({" "});
-    banner_[2].format().hide_border_top();
-
-    std::ostringstream os;
-    os << termcolor::colorize << banner_ << "\n";
-
-    send(os.str());
-  }
-
   state player::create_player(std::string const& input)
   {
     if(input.empty()) return state::new_player;
 
     name_ = input;
     send("Welcome " + input + " !\n");
+    send("Choose a password: \n");
+    return state::ask_password;
+  }
+
+  state player::ask_password(std::string const& input)
+  {
+    if(input.empty()) return state::ask_password;
+
+    password_ = input;
+    send("Your password is: " + input + "\n");
+    save_player();
+
+    send( game_context_.strings()["new_player"] );
 
     return state::play;
   }
@@ -107,13 +114,13 @@ namespace mudpp
     if(input == "L" || input == "l")
     {
       game_context_.log(std::cout,"GAME") << "Loading character" << std::endl;
-      send("Loading player file...\n");
-      return state::play;
+      send("Character name: ");
+      return state::load_player;
     }
     else if(input == "C" || input == "c")
     {
       game_context_.log(std::cout,"GAME") << "Creating character" << std::endl;
-      send("Character name:\n");
+      send("Character name: ");
       return state::new_player;
     }
     else
@@ -127,14 +134,18 @@ namespace mudpp
   {
     if(input == "/quit")
     {
+      game_context_.log(std::cout,"PLAYER") << name_ << " quitting." << std::endl;
       send("Bye " + name_ + " !\n");
-      current_state_ = state::disconnected;
       session_.disconnect();
+
+      return state::disconnected;
     }
     else if(input == "/shutdown")
     {
       send("Bye " + name_ + " !\nThe server will now shutdown ...\n");
       game_context_.shutdown();
+
+      return state::disconnected;
     }
     else if(input == "/hello")
     {
@@ -146,5 +157,68 @@ namespace mudpp
     }
 
     return state::play;
+  }
+
+  state player::load_player(std::string const& input)
+  {
+    auto path = game_context_.paths()["saves"] + input + ".player";
+    name_     = input;
+
+    if( game_context_.exists(*this) )
+    {
+      send(input + " is already logged in.\n");
+      login_prompt();
+      return state::login;
+    }
+
+    if( std::filesystem::exists(path) )
+    {
+      game_context_.script_engine().script_file(path.c_str());
+
+      sol::table player_info = game_context_.script_engine()["player"];
+
+      password_ = player_info[ "password" ];
+      send( "Password: ");
+
+      return state::check_password;
+    }
+    else
+    {
+      send( "Unknown player " + input + "\n"
+            "Character name:"
+          );
+
+      return state::load_player;
+    }
+  }
+
+  state player::check_password(std::string const& input)
+  {
+    if(password_ != input)
+    {
+      send( "Incorrect password.\n");
+      send( "Password: ");
+
+      return state::check_password;
+    }
+    else
+    {
+      send( game_context_.strings()["returning_player"] );
+      return state::play;
+    }
+  }
+
+  void player::save_player()
+  {
+    auto path = game_context_.paths()["saves"]  + name_ + ".player";
+    game_context_.log(std::cout,"PLAYER") << "Saving character to: "  << path << std::endl;
+    std::ofstream file( path.c_str() );
+
+    file << "--\n";
+    file << "-- MUDPP SAVE FILE\n";
+    file << "--\n";
+    file << "player =  { name      = \"" << name_     << "\",\n";
+    file << "            password  = \"" << password_ << "\",\n";
+    file << "          }\n";
   }
 }

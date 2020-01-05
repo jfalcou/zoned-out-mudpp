@@ -29,7 +29,7 @@ function(add_demo root)
     target_compile_options  ( ${test} PUBLIC ${options} )
 
     set_property( TARGET ${test}
-                  PROPERTY RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/demo"
+                  PROPERTY RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/game"
                 )
 
     set_target_properties ( ${test} PROPERTIES
@@ -53,12 +53,12 @@ function(add_demo root)
                             Threads::Threads
                           )
 
-    add_dependencies(demo ${test})
+    add_dependencies(game ${test})
 
     add_parent_target(${test})
   endforeach()
 endfunction()
 
 ## Setup our tests
-add_custom_target(demo)
-add_subdirectory(${PROJECT_SOURCE_DIR}/demo/)
+add_custom_target(game)
+add_subdirectory(${PROJECT_SOURCE_DIR}/game/)

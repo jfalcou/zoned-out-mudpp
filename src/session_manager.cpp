@@ -20,12 +20,6 @@ namespace mudpp
                   : game_context_(g)
                   , acceptor_(game_context_.io(), endpoint_t(boost::asio::ip::tcp::v4(), port))
   {
-    // Cleanup unused sessions every 0.5s
-    game_context_.register_event( 500, [this]() { cleanup(); } );
-
-    // Prompt a stat of the server every 5s
-    game_context_.register_event( 5000, [this]() { stats(); } );
-
     // Starts accepting sessions
     accept();
   }

@@ -20,8 +20,8 @@ namespace mudpp
   {
     login,
     load_player,
-    new_player,
     check_password,
+    new_player,
     ask_password,
     play,
     disconnected
@@ -34,6 +34,7 @@ namespace mudpp
     player(session& s);
 
     static std::unique_ptr<player> make(session& s);
+    void login_prompt();
 
     void process_input(std::string const& input);
     void tick();
@@ -41,18 +42,24 @@ namespace mudpp
 
     std::string const& name() const { return name_; }
 
+    state current_state() const { return current_state_; }
     bool is_connected() const { return current_state_ != state::disconnected; }
+    bool is_logged()    const { return current_state_ == state::play; }
 
     private:
-    void banner();
     state process_login(std::string const& input);
     state play(std::string const& input);
     state create_player(std::string const& input);
+    state load_player(std::string const& input);
+    state ask_password(std::string const& input);
+    state check_password(std::string const& input);
 
-    std::string name_;
+    void save_player();
+
     session&    session_;
     game&       game_context_;
     state       current_state_;
+    std::string name_, password_;
   };
 
   using player_t = std::unique_ptr<player>;

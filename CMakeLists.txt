@@ -64,6 +64,6 @@ add_subdirectory(src)
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION .)
 
 ## =================================================================================================
-## Demo targets
+## Actual game
 ## =================================================================================================
 include(demo)
