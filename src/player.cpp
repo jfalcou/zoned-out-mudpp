@@ -13,32 +13,44 @@
 #include <mudpp/system/io.hpp>
 #include <tabulate/termcolor.hpp>
 #include <tabulate/table.hpp>
+#include <sol/sol.hpp>
+#include <string_view>
 #include <fstream>
-#include <filesystem>
 
 namespace mudpp
 {
+  void player::setup_scripting( sol::usertype<player>& player_type, sol::state& lua)
+  {
+    // make usertype metatable
+    player_type = lua.new_usertype<player>("player");
+    player_type["tick"]         = &player::tick;
+    player_type["send"]         = &player::send;
+    player_type["save"]         = &player::save;
+    player_type["name"]         = sol::property(&player::name, &player::set_name);
+    player_type["password"]     = sol::property(&player::password, &player::set_password);
+    player_type["prompt"]       = &player::login_prompt;
+    player_type["is_connected"] = &player::is_connected;
+    player_type["is_logged"]    = &player::is_logged;
+    player_type["state"]        = sol::property(&player::current_state, &player::set_state);
+  }
+
   player::player(session& s)
         : session_(s)
         , game_context_(s.context())
-        , current_state_(state::login)
+        , current_state_(0)
   {
     auto b = box_message( {"@", tabulate::Color::yellow}
                         , {"¤", tabulate::Color::yellow}
                         , {{tabulate::FontStyle::bold},tabulate::Color::red,tabulate::FontAlign::center}
                         , 100
                         , game_context_.strings()["welcome"]
-                        //"Welcome to Mud++\n¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤\n\nCopyright 2020 Joel FALCOU"
                         );
 
     send(b);
     login_prompt();
   }
 
-  player_t player::make(session& s)
-  {
-    return std::make_unique<player>(s);
-  }
+  player_t player::make(session& s) { return std::make_unique<player>(s); }
 
   void player::login_prompt()
   {
@@ -55,160 +67,18 @@ namespace mudpp
 
   void player::process_input(std::string const& input)
   {
-    switch(current_state_)
-    {
-      case state::login:  current_state_ = process_login(input);
-                          break;
+    using namespace std::literals;
+    current_state_ = game_context_.call<int>("process_input"sv, current_state_, *this, input);
 
-      case state::new_player: current_state_ = create_player(input);
-                              break;
-
-      case state::ask_password: current_state_ = ask_password(input);
-                              break;
-
-      case state::load_player: current_state_ = load_player(input);
-                              break;
-
-      case state::check_password: current_state_ = check_password(input);
-                                  break;
-
-      case state::play:   current_state_ = play(input);
-                          break;
-
-      default:  break;
-    }
+    if(current_state_ == int(game_context_.script_engine()["state"]["disconnected"]))
+      game_context_.shutdown();
   }
 
   void player::send( std::string const& msg ) { session_.send(msg); }
 
-  void player::tick() { if(current_state_ == state::play) send(info("**TICK**")); }
+  void player::tick() { if(current_state_ == 5) send(info("**TICK**")); }
 
-  state player::create_player(std::string const& input)
-  {
-    if(input.empty()) return state::new_player;
-
-    name_ = input;
-    send("Welcome " + input + " !\n");
-    send("Choose a password: \n");
-    return state::ask_password;
-  }
-
-  state player::ask_password(std::string const& input)
-  {
-    if(input.empty()) return state::ask_password;
-
-    password_ = input;
-    send("Your password is: " + input + "\n");
-    save_player();
-
-    send( game_context_.strings()["new_player"] );
-
-    return state::play;
-  }
-
-  state player::process_login(std::string const& input)
-  {
-    game_context_.log(std::cout,"GAME") << "Login" << std::endl;
-
-    // Input contains (L or l) / (C or c)
-    if(input == "L" || input == "l")
-    {
-      game_context_.log(std::cout,"GAME") << "Loading character" << std::endl;
-      send("Character name: ");
-      return state::load_player;
-    }
-    else if(input == "C" || input == "c")
-    {
-      game_context_.log(std::cout,"GAME") << "Creating character" << std::endl;
-      send("Character name: ");
-      return state::new_player;
-    }
-    else
-    {
-      send("Sorry, your choice is invalid.\n");
-      return state::login;
-    }
-  }
-
-  state player::play(std::string const& input)
-  {
-    if(input == "/quit")
-    {
-      game_context_.log(std::cout,"PLAYER") << name_ << " quitting." << std::endl;
-      send("Bye " + name_ + " !\n");
-      session_.disconnect();
-
-      return state::disconnected;
-    }
-    else if(input == "/shutdown")
-    {
-      send("Bye " + name_ + " !\nThe server will now shutdown ...\n");
-      game_context_.shutdown();
-
-      return state::disconnected;
-    }
-    else if(input == "/hello")
-    {
-      send("Hello " + name_ + " !\n");
-    }
-    else
-    {
-      send("No comprendo senor!\n");
-    }
-
-    return state::play;
-  }
-
-  state player::load_player(std::string const& input)
-  {
-    auto path = game_context_.paths()["saves"] + input + ".player";
-    name_     = input;
-
-    if( game_context_.exists(*this) )
-    {
-      send(input + " is already logged in.\n");
-      login_prompt();
-      return state::login;
-    }
-
-    if( std::filesystem::exists(path) )
-    {
-      game_context_.script_engine().script_file(path.c_str());
-
-      sol::table player_info = game_context_.script_engine()["player"];
-
-      password_ = player_info[ "password" ];
-      send( "Password: ");
-
-      return state::check_password;
-    }
-    else
-    {
-      send( "Unknown player " + input + "\n"
-            "Character name:"
-          );
-
-      return state::load_player;
-    }
-  }
-
-  state player::check_password(std::string const& input)
-  {
-    if(password_ != input)
-    {
-      send( "Incorrect password.\n");
-      send( "Password: ");
-
-      return state::check_password;
-    }
-    else
-    {
-      send( game_context_.strings()["returning_player"] );
-      return state::play;
-    }
-  }
-
-  void player::save_player()
+  void player::save()
   {
     auto path = game_context_.paths()["saves"]  + name_ + ".player";
     game_context_.log(std::cout,"PLAYER") << "Saving character to: "  << path << std::endl;

@@ -16,7 +16,7 @@ function(add_demo root)
   if( MSVC )
     set( options /std:c++latest -W3 -EHsc)
   else()
-    set( options -std=c++17 -Wall -Wno-missing-braces )
+    set( options -std=c++17 -Wall -Wno-missing-braces -DSOL_ALL_SAFETIES_ON=1)
   endif()
 
   foreach(file ${ARGN})

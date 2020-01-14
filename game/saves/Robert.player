@@ -1,0 +1,6 @@
+--
+-- MUDPP SAVE FILE
+--
+player =  { name      = "Robert",
+            password  = "ayanamirei",
+          }
