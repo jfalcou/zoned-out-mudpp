@@ -24,6 +24,7 @@ namespace mudpp
     // make usertype metatable
     player_type = lua.new_usertype<player>("player");
     player_type["tick"]         = &player::tick;
+    player_type["disconnect"]   = &player::disconnect;
     player_type["send"]         = &player::send;
     player_type["save"]         = &player::save;
     player_type["name"]         = sol::property(&player::name, &player::set_name);
@@ -69,9 +70,11 @@ namespace mudpp
   {
     using namespace std::literals;
     current_state_ = game_context_.call<int>("process_input"sv, current_state_, *this, input);
+  }
 
-    if(current_state_ == int(game_context_.script_engine()["state"]["disconnected"]))
-      game_context_.shutdown();
+  void player::disconnect()
+  {
+    game_context_.shutdown();
   }
 
   void player::send( std::string const& msg ) { session_.send(msg); }

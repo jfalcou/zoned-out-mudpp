@@ -143,7 +143,7 @@ namespace mudpp
   void game::setup_scripting( std::string const& config_file )
   {
     lua_state_.open_libraries ( sol::lib::base, sol::lib::io, sol::lib::string
-                              , sol::lib::math, sol::lib::os
+                              , sol::lib::math, sol::lib::os, sol::lib::package
                               );
 
     // Provide access to game::log from LUA
