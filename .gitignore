@@ -41,3 +41,4 @@
 *build*/
 Testing/
 doc/conf.py
+*.player

@@ -1,6 +1,0 @@
---
--- MUDPP SAVE FILE
---
-player =  { name      = "Bob",
-            password  = "bob",
-          }
