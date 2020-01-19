@@ -1,6 +1,8 @@
 ----------------------------------------------------------------------------------------------------
 -- Basic option for MUDpp
 ----------------------------------------------------------------------------------------------------
+local module_folder = "./modules/"
+package.path = module_folder .. "?.lua;" .. package.path
 
 ----------------------------------------------------------------------------------------------------
 -- Path to MUD files
@@ -23,24 +25,3 @@ base_period    =   100  -- base period for event
 tick_period    =  5000  -- broadcast **TICK** every 5s
 cleanup_period =  1000  -- Cleanup system resources every 1s
 stats_period   = 10000  -- Display resources status every 10s
-
-----------------------------------------------------------------------------------------------------
--- In-game states table
-----------------------------------------------------------------------------------------------------
-state = { login = 0 , load_player = 1 , check_password = 2
-                    , new_player  = 3 , ask_password    = 4
-        , play = 5
-        , disconnected = 6
-        }
-
-----------------------------------------------------------------------------------------------------
--- Helpers functions
-----------------------------------------------------------------------------------------------------
-function file_exists(name)
-   local f=io.open(name,"r")
-   if f~=nil then io.close(f) return true else return false end
-end
-
-function is_empty(s)
-  return s == nil or s == ''
-end
