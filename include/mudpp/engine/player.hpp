@@ -25,6 +25,7 @@ namespace mudpp
     static std::unique_ptr<player> make(session& s);
 
     void tick();
+    void shutdown();
     void disconnect();
     void login_prompt();
     void save();

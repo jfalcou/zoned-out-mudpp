@@ -14,6 +14,21 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Checks a string is empty
 ----------------------------------------------------------------------------------------------------
+function utils.split(inputstr, sep)
+  sep = sep or "%s"
+
+  local t={}
+
+  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+    table.insert(t, str)
+  end
+
+  return t
+end
+
+----------------------------------------------------------------------------------------------------
+-- Checks a string is empty
+----------------------------------------------------------------------------------------------------
 function utils.is_empty(s)
   return s == nil or s == ''
 end
@@ -21,8 +36,8 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Checks if a table has data associated to a given key
 ----------------------------------------------------------------------------------------------------
-function utils.contain_key(table, key)
-  for k, _ in pairs(table) do
+function utils.contain_key(values, key)
+  for k, _ in pairs(values) do
     if k == key then
       return true
     end

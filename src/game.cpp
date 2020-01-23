@@ -26,7 +26,7 @@ namespace mudpp
     setup_scripting(config_file);
 
     // Build session
-    int port    = lua_state_["port"];
+    int port  = lua_state_["port"];
     sessions_ = std::make_unique<session_manager>(*this,port);
 
     // Read messages
@@ -144,6 +144,7 @@ namespace mudpp
   {
     lua_state_.open_libraries ( sol::lib::base, sol::lib::io, sol::lib::string
                               , sol::lib::math, sol::lib::os, sol::lib::package
+                              , sol::lib::table
                               );
 
     // Provide access to game::log from LUA

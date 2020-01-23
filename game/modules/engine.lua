@@ -6,7 +6,9 @@ local engine = {}
 ----------------------------------------------------------------------------------------------------
 -- Load modules
 ----------------------------------------------------------------------------------------------------
-utils = require "utils"
+utils   = require "utils"
+command = require "command"
+require "table"
 
 ----------------------------------------------------------------------------------------------------
 -- In-game states table
@@ -113,35 +115,9 @@ end
 -- Main game loop
 ----------------------------------------------------------------------------------------------------
 function engine.play(current_player, input)
-
-  if( input == "/shutdown" ) then
-    current_player:send("Bye " .. current_player.name .. " !\nThe server will now shutdown ...\n");
-    current_player:disconnect()
-    return engine.state["disconnected"]
-  end
-
-  --   if(input == "/quit")
-  --   {
-  --     game_context_.log(std::cout,"PLAYER") << name_ << " quitting." << std::endl;
-  --     send("Bye " + name_ + " !\n");
-  --     session_.disconnect();
-
-  --     return state::disconnected;
-  --   }
-  --   else if(input == "/shutdown")
-  --   {
-
-  --   }
-  --   else if(input == "/hello")
-  --   {
-  --     return game_context_.call<state>("hello"sv,*this);
-  --   }
-  --   else
-  --   {
-  current_player:send("No comprendo senor!\n");
-  --   }
-
-  return engine.state["play"]
+  local args      = utils.split(input)
+  local operation = table.remove(args,1)
+  return command.perform(current_player, operation, args, engine.state)
 end
 
 ----------------------------------------------------------------------------------------------------
