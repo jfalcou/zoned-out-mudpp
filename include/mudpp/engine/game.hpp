@@ -14,6 +14,7 @@
 #include <mudpp/engine/player.hpp>
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
+#include <string_view>
 #include <vector>
 #include <map>
 
@@ -30,7 +31,6 @@ namespace mudpp
     bool run();
     void shutdown();
 
-
     player* find_player(std::string const& name);
     player* attach_player(session&);
 
@@ -38,6 +38,14 @@ namespace mudpp
     sol::state&                         script_engine() { return lua_state_;  }
     boost::asio::io_service&            io()            { return ios_;        }
     std::map<std::string,std::string>&  paths()         { return paths_.value(); }
+
+    template<typename Ret, typename Name, typename... Args>
+    auto inline call(Name const& f, Args&&... args)
+    {
+      sol::function func = lua_state_[f];
+      Ret that = func(std::forward<Args>(args)...);
+      return that;
+    }
 
     bool exists( player const& p);
 
@@ -48,16 +56,21 @@ namespace mudpp
 
     private:
 
-    void lua_setup();
-    void cleanup();
-
+    // NETWORK
     boost::asio::io_service                         ios_;
     std::vector<periodic_event_t>                   events_;
     std::vector<player_t>                           players_;
     sol::nested<std::map<std::string, std::string>> paths_;
     sol::nested<std::map<std::string, std::string>> messages_;
     std::unique_ptr<mudpp::session_manager>         sessions_;
+
+    // LUA
+    void setup_scripting( std::string const& config_file );
     sol::state                                      lua_state_;
+    sol::usertype<player>                           player_type;
+
+    // GAME
+    void cleanup();
     int                                             period_;
     bool                                            shutdown_;
   };

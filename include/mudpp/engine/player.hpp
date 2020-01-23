@@ -11,54 +11,46 @@
 #define MUDPP_ENGINE_PLAYER_HPP_INCLUDED
 
 #include <mudpp/system/session.hpp>
+#include <sol/sol.hpp>
 #include <string>
 #include <memory>
 
 namespace mudpp
 {
-  enum class state : std::uint8_t
-  {
-    login,
-    load_player,
-    check_password,
-    new_player,
-    ask_password,
-    play,
-    disconnected
-  };
-
   struct game;
 
   struct player
   {
     player(session& s);
-
     static std::unique_ptr<player> make(session& s);
-    void login_prompt();
 
-    void process_input(std::string const& input);
     void tick();
+    void shutdown();
+    void disconnect();
+    void login_prompt();
+    void save();
+    void process_input(std::string const& input);
     void send( std::string const& msg );
 
-    std::string const& name() const { return name_; }
+    std::string const&  name() const { return name_; }
+    void                set_name(std::string const& n) { name_ = n; }
+    std::string const&  password() const { return password_; }
+    void                set_password(std::string const& p) { password_ = p; }
 
-    state current_state() const { return current_state_; }
-    bool is_connected() const { return current_state_ != state::disconnected; }
-    bool is_logged()    const { return current_state_ == state::play; }
+    int current_state()     const { return current_state_;  }
+    void  set_state(int s)        { current_state_ = s;     }
+
+    bool is_connected() const { return current_state_ != 6; }
+    bool is_logged()    const { return current_state_ == 5; }
+
+    static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
     private:
-    state process_login(std::string const& input);
-    state play(std::string const& input);
-    state create_player(std::string const& input);
-    state load_player(std::string const& input);
-    state ask_password(std::string const& input);
-    state check_password(std::string const& input);
-
     void save_player();
 
     session&    session_;
     game&       game_context_;
-    state       current_state_;
+    int         current_state_;
     std::string name_, password_;
   };
 

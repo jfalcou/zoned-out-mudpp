@@ -22,15 +22,11 @@ namespace mudpp
   game::game( std::string const& config_file )
       : ios_(), events_(), players_(), shutdown_(false)
   {
-    lua_setup();
-
-    // Read config
-    lua_state_.script_file(config_file.c_str());
-    paths_      = lua_state_["path"];
-    period_  = lua_state_["base_period"];
-    int port    = lua_state_["port"];
+    // Setup LUA
+    setup_scripting(config_file);
 
     // Build session
+    int port  = lua_state_["port"];
     sessions_ = std::make_unique<session_manager>(*this,port);
 
     // Read messages
@@ -144,10 +140,11 @@ namespace mudpp
     sessions_->cleanup();
   }
 
-  void game::lua_setup()
+  void game::setup_scripting( std::string const& config_file )
   {
     lua_state_.open_libraries ( sol::lib::base, sol::lib::io, sol::lib::string
-                              , sol::lib::math, sol::lib::os
+                              , sol::lib::math, sol::lib::os, sol::lib::package
+                              , sol::lib::table
                               );
 
     // Provide access to game::log from LUA
@@ -155,8 +152,22 @@ namespace mudpp
                             , [&](std::string const& s) { log(std::cout,"LUA") << s << std::endl; }
                             );
 
+    // Provide access to game::exists from LUA
+    lua_state_.set_function ( "mudpp_player_exists"
+                            , [&](player const& p) { return exists( p ); }
+                            );
+
     // Sanity check
     lua_state_.script ( "mudpp_log('LUA engine started.')" );
+
+    // Read config
+    lua_state_.script_file(config_file.c_str());
+    paths_      = lua_state_["path"];
+    period_     = lua_state_["base_period"];
+
+    // Perform scripting setup for other types
+    player::setup_scripting(player_type, lua_state_);
+    lua_state_.script_file( paths()["player"].c_str() );
   }
 
   player* game::attach_player(session& s)
