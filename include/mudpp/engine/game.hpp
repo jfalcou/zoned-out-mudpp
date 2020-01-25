@@ -67,7 +67,8 @@ namespace mudpp
     // LUA
     void setup_scripting( std::string const& config_file );
     sol::state                                      lua_state_;
-    sol::usertype<player>                           player_type;
+    sol::usertype<player>                           player_type_;
+    sol::table                                      system_module_;
 
     // GAME
     void cleanup();

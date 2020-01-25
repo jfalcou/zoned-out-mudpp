@@ -23,7 +23,7 @@ engine.state =  { login = 0 , load_player = 1 , check_password = 2
 -- Process player's login
 ----------------------------------------------------------------------------------------------------
 function engine.process_login(player, input)
-  mudpp_log('Processing login via [' .. input .. ']')
+  game.log('Processing login via [' .. input .. ']')
 
   local commands =
   {
@@ -46,21 +46,21 @@ function engine.load_player(current_player, input)
 
   current_player.name = input
 
-  if( mudpp_player_exists(current_player) )  then
-    mudpp_log('Load player - ' .. input .. ' already logged.')
+  if( game.player_exists(current_player) )  then
+    game.log('Load player - ' .. input .. ' already logged.')
     current_player:send(input .. " is already logged in.\n", true)
     current_player:prompt()
     return engine.state["login"]
   end
 
   if( utils.file_exists(savegame_path) ) then
-    mudpp_log('Loading ' .. savegame_path)
+    game.log('Loading ' .. savegame_path)
     dofile(savegame_path)
     current_player.password = player["password"]
     current_player:send("Password: ")
     return engine.state["check_password"]
   else
-    mudpp_log('Unknown player ' .. input)
+    game.log('Unknown player ' .. input)
     current_player:send( "Unknown player " .. input .. "\n" .. "Character name:", true )
     return engine.state["load_player"]
   end
@@ -121,7 +121,7 @@ function engine.play(current_player, input)
 end
 
 ----------------------------------------------------------------------------------------------------
-mudpp_log('Module engine - loaded')
+game.log('Module engine - loaded')
 ----------------------------------------------------------------------------------------------------
 
 return engine

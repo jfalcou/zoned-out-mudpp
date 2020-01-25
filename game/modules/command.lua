@@ -11,7 +11,7 @@ local command = {}
 -- Quit command
 ----------------------------------------------------------------------------------------------------
 function command.quit(current_player, cmd, args, states)
-  current_player:send( "Bye @y#b".. current_player.name .."##.", true )
+  current_player:send( "Bye @y#b".. current_player.name .."##.\n", true )
   current_player:disconnect()
   return states["disconnected"]
 end
@@ -62,7 +62,7 @@ function command.perform(current_player, cmd, args, states)
 end
 
 ----------------------------------------------------------------------------------------------------
-mudpp_log('Module command - loaded')
+game.log('Module command - loaded')
 ----------------------------------------------------------------------------------------------------
 
 return command

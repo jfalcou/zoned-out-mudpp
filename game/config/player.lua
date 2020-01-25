@@ -26,5 +26,5 @@ function process_input(current, player, input)
 end
 
 ----------------------------------------------------------------------------------------------------
-mudpp_log('Player script successfully loaded.')
+game.log('Player script successfully loaded.')
 ----------------------------------------------------------------------------------------------------

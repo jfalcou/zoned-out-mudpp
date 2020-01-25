@@ -139,23 +139,28 @@ namespace mudpp
                               , sol::lib::table
                               );
 
+    system_module_ = lua_state_["game"].force();
+
     // Provide access to game::log from LUA
-    lua_state_.set_function ( "mudpp_log"
-                            , [&](std::string const& s) { log(std::cout,"LUA") << s << std::endl; }
-                            );
+    system_module_.set_function ( "log"
+                                , [&](std::string const& s)
+                                  {
+                                    log(std::cout,"LUA") << s << std::endl;
+                                  }
+                                );
 
     // Provide access to game::exists from LUA
-    lua_state_.set_function ( "mudpp_player_exists"
-                            , [&](player const& p) { return exists( p ); }
-                            );
+    system_module_.set_function ( "player_exists"
+                                , [&](player const& p) { return exists( p ); }
+                                );
 
     // Provide access to a "build a colored text" for lUA
-    lua_state_.set_function ( "mudpp_message"
-                            , [&](std::string const& s) { return colorize(s); }
-                            );
+    system_module_.set_function ( "colorize"
+                                , [&](std::string const& s) { return colorize(s); }
+                                );
 
     // Sanity check
-    lua_state_.script ( "mudpp_log('LUA engine started.')" );
+    lua_state_.script ( "game.log('LUA engine started.')" );
 
     // Read config
     lua_state_.script_file(config_file.c_str());
@@ -163,7 +168,7 @@ namespace mudpp
     period_     = lua_state_["base_period"];
 
     // Perform scripting setup for other types
-    player::setup_scripting(player_type, lua_state_);
+    player::setup_scripting(player_type_, lua_state_);
     lua_state_.script_file( paths()["player"].c_str() );
   }
 

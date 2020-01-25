@@ -63,7 +63,7 @@ function utils.select_command(commands,choice)
 end
 
 ----------------------------------------------------------------------------------------------------
-mudpp_log('Module utils - loaded')
+game.log('Module utils - loaded')
 ----------------------------------------------------------------------------------------------------
 
 return utils
