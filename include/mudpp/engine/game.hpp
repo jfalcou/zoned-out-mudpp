@@ -31,6 +31,8 @@ namespace mudpp
     bool run();
     void shutdown();
 
+    void broadcast(std::string const& message, bool use_color);
+
     player* find_player(std::string const& name);
     player* attach_player(session&);
 

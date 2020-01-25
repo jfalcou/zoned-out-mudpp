@@ -11,7 +11,7 @@ local command = {}
 -- Quit command
 ----------------------------------------------------------------------------------------------------
 function command.quit(current_player, cmd, args, states)
-  current_player:send( "Bye @y#b".. current_player.name .."##.\n", true )
+  game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n", true )
   current_player:disconnect()
   return states["disconnected"]
 end
@@ -20,11 +20,7 @@ end
 -- Shutdown command
 ----------------------------------------------------------------------------------------------------
 function command.shutdown(current_player, cmd, args, states)
-  current_player:send( "Bye @y#b"
-                       .. current_player.name ..
-                       "## !\nThe server will now shutdown ...\n"
-                      , true
-                      )
+  game.broadcast( "@r#bThe server will now shutdown ...##\n", true )
   current_player:shutdown()
   return states["disconnected"]
 end
@@ -33,11 +29,7 @@ end
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
 function command.unknown(current_player, cmd, args, states)
-  current_player:send("I... I don't understand. What do you mean by '@r#b"
-                      .. cmd ..
-                      "##' ?\n"
-                      , true
-                      )
+  current_player:send("I don't understand. What do you mean by '@r#b".. cmd .."##' ?\n", true)
   return states["play"]
 end
 

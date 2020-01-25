@@ -96,9 +96,6 @@ namespace mudpp
         }
 
       } while( !shutdown_ );
-
-      // Notify of shutdown
-      sessions_->broadcast(urgent("**Server is shutting down NOW!**"));
     }
     catch(std::exception& e)
     {
@@ -108,9 +105,18 @@ namespace mudpp
       return false;
     }
 
+    // Propagate updates through all open sessions to flush last messages
+    sessions_->tick();
     log(std::cout,"GAME") << "Shutting down..." << std::endl;
 
     return true;
+  }
+
+  void game::broadcast(std::string const& message, bool use_color)
+  {
+    std::for_each ( players_.begin(), players_.end()
+                  , [&](auto const& p) { if(p->is_connected()) p->send(message, use_color); }
+                  );
   }
 
   // Go over every sessions and remove/erase all that are invalid
@@ -157,6 +163,14 @@ namespace mudpp
     // Provide access to a "build a colored text" for lUA
     system_module_.set_function ( "colorize"
                                 , [&](std::string const& s) { return colorize(s); }
+                                );
+
+    // Broadcast message to all connected players
+    system_module_.set_function ( "broadcast"
+                                , [&](std::string const& s, bool use_color)
+                                  {
+                                    broadcast(s,use_color);
+                                  }
                                 );
 
     // Sanity check
