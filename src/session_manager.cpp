@@ -9,7 +9,6 @@
 //==================================================================================================
 #include <mudpp/system/session_manager.hpp>
 #include <mudpp/engine/game.hpp>
-#include <tabulate/termcolor.hpp>
 #include <iostream>
 #include <cstdint>
 #include <memory>

@@ -12,10 +12,8 @@
 #include <mudpp/system/timestamp.hpp>
 #include <mudpp/system/session.hpp>
 #include <mudpp/system/io.hpp>
-#include <tabulate/termcolor.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
-#include <sstream>
 
 namespace mudpp
 {
@@ -48,13 +46,7 @@ namespace mudpp
 
   std::ostream& game::log(std::ostream& os, std::string const& context)
   {
-    os  << termcolor::bold << timestamp
-        << "[";
-
-    if(&os == &std::cerr) os << termcolor::red;
-    else                  os << termcolor::blue;
-
-    os << context << termcolor::reset << termcolor::bold << "] - " << termcolor::reset;
+    os << timestamp << "[" << context << "] - ";
     return os;
   }
 
@@ -157,6 +149,11 @@ namespace mudpp
                             , [&](player const& p) { return exists( p ); }
                             );
 
+    // Provide access to a "build a colored text" for lUA
+    lua_state_.set_function ( "mudpp_message"
+                            , [&](std::string const& s) { return colorize(s); }
+                            );
+
     // Sanity check
     lua_state_.script ( "mudpp_log('LUA engine started.')" );
 
@@ -174,6 +171,21 @@ namespace mudpp
   {
     log(std::cout,"GAME") << "New player connected." << std::endl;
     players_.push_back(player::make(s));
-    return players_.back().get();
+
+    auto& p = players_.back();
+    auto b = box_message( {"@", tabulate::Color::yellow}
+                        , {"¤", tabulate::Color::yellow}
+                        , { {tabulate::FontStyle::bold}
+                          , tabulate::Color::red
+                          , tabulate::FontAlign::center
+                          }
+                        , 100
+                        , strings()["welcome"]
+                        );
+
+    p->send(b,false);
+    p->login_prompt();
+
+    return p.get();
   }
 }

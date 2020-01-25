@@ -42,7 +42,8 @@ namespace mudpp
   void session::start()
   {
     game_context_.log(std::cout,"NETWORK")  << "Connection from: "
-                                            << socket_.remote_endpoint() << std::endl;
+                                            << socket_.remote_endpoint()
+                                            << std::endl;
 
     // Bind current session to a new player in game_context
     active_player_ = game_context_.attach_player(*this);
@@ -78,7 +79,6 @@ namespace mudpp
         incoming_message_ = incoming_message_.substr(i + 1);
 
         // Do something with it
-        game_context_.log(std::cout,"INPUT") << "Processing: '"<< line << "'" << std::endl;
         active_player_->process_input(line);
       }
 

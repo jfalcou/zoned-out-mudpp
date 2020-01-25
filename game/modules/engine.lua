@@ -27,14 +27,14 @@ function engine.process_login(player, input)
 
   local commands =
   {
-    ["L"] = {prompt="Character name: "                , out="load_player" },
-    ["C"] = {prompt="Character name: "                , out="new_player"  },
-    ["~"] = {prompt="Sorry, your choice is invalid.\n", out="login"       }
+    ["L"] = {prompt="##Character name: "                , out="load_player" },
+    ["C"] = {prompt="##Character name: "                , out="new_player"  },
+    ["~"] = {prompt="##Sorry, your choice is invalid.\n", out="login"       }
   }
 
   local c = utils.select_command(commands,input)
 
-  player:send(c.prompt)
+  player:send(c.prompt, true)
   return engine.state[c.out]
 end
 
@@ -48,7 +48,7 @@ function engine.load_player(current_player, input)
 
   if( mudpp_player_exists(current_player) )  then
     mudpp_log('Load player - ' .. input .. ' already logged.')
-    current_player:send(input .. " is already logged in.\n")
+    current_player:send(input .. " is already logged in.\n", true)
     current_player:prompt()
     return engine.state["login"]
   end
@@ -61,7 +61,7 @@ function engine.load_player(current_player, input)
     return engine.state["check_password"]
   else
     mudpp_log('Unknown player ' .. input)
-    current_player:send( "Unknown player " .. input .. "\n" .. "Character name:" )
+    current_player:send( "Unknown player " .. input .. "\n" .. "Character name:", true )
     return engine.state["load_player"]
   end
 end
@@ -125,8 +125,3 @@ mudpp_log('Module engine - loaded')
 ----------------------------------------------------------------------------------------------------
 
 return engine
-
--- function hello(p)
---   p:send("Hello dear " .. p:name() ..", how are you ?\n")
---   return engine.state["play"]
--- end
