@@ -79,6 +79,11 @@ namespace mudpp
           {
             case 'b' : output_os << termcolor::bold;      break;
             case 'i' : output_os << termcolor::italic;    break;
+            case 'u' : output_os << termcolor::underline; break;
+            case 'd' : output_os << termcolor::dark;      break;
+            case 'k' : output_os << termcolor::blink;     break;
+            case 's' : output_os << termcolor::crossed;   break;
+            case 'r' : output_os << termcolor::reverse;   break;
             case '#' : output_os << termcolor::reset;     break;
             default: break;
           }
