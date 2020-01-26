@@ -195,6 +195,18 @@ namespace mudpp
                                   }
                                 );
 
+    // Broadcast message to all connected players
+    system_module_.set_function ( "find_room"
+                                , [&](int id)
+                                  {
+                                    auto r = find_room(id);
+                                    if(!r) log(std::cout,"GAME")  << "Room " << id
+                                                                  << " does not exists"
+                                                                  << std::endl;
+                                    return *r;
+                                  }
+                                );
+
     // Sanity check
     lua_state_.script ( "game.log('LUA engine started.')" );
 

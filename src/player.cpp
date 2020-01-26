@@ -33,6 +33,7 @@ namespace mudpp
     player_type["prompt"]       = &player::login_prompt;
     player_type["is_connected"] = &player::is_connected;
     player_type["is_logged"]    = &player::is_logged;
+    player_type["location"]     = &player::location;
     player_type["state"]        = sol::property(&player::current_state, &player::set_state);
   }
 
@@ -69,9 +70,10 @@ namespace mudpp
   {
     if(use_color) session_.send(colorize(msg));
     else          session_.send(msg);
+    if(current_state_ == 50) session_.send(colorize("#b>##"));
   }
 
-  void player::tick() { if(current_state_ == 5) send(info("**TICK**")); }
+  void player::tick() { if(current_state_ == 50) send(info("\n**TICK**")); }
 
   void player::enter(int id)
   {
@@ -84,7 +86,7 @@ namespace mudpp
     {
       game_context_.log(std::cerr,"PLAYER") << name_ << " tried to access room #" << id
                                             << " which is not registered.";
-      send("You feel dizzy and don't really know where you where goind...\n");
+      send("Where are you going ?\n");
     }
   }
 
@@ -109,7 +111,7 @@ namespace mudpp
       }
       else
       {
-        send("You feel dizzy and don't really know where you where goind...\n");
+        send("Where are you going ?\n");
       }
     }
   }

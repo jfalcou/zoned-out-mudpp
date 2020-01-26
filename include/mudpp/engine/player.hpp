@@ -38,6 +38,7 @@ namespace mudpp
     void enter(int id);
     void exit();
 
+    room const& location() const { return *current_room_; }
     std::string const&  name() const { return name_; }
     void                set_name(std::string const& n) { name_ = n; }
     std::string const&  password() const { return password_; }

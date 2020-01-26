@@ -69,9 +69,10 @@ namespace mudpp
   {
     // make usertype metatable
     ut = lua.new_usertype<room>("room");
-    ut["tick"]         = &room::tick;
-    ut["id"]           = sol::property(&room::id          , &room::set_id);
-    ut["name"]         = sol::property(&room::name        , &room::set_name);
-    ut["description"]  = sol::property(&room::description , &room::set_description);
+    ut["tick"]        = &room::tick;
+    ut["go"]          = &room::go;
+    ut["id"]          = sol::property(&room::id          , &room::set_id);
+    ut["name"]        = sol::property(&room::name        , &room::set_name);
+    ut["description"] = sol::property(&room::description , &room::set_description);
   }
 }
