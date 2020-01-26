@@ -16,6 +16,8 @@
 
 namespace mudpp
 {
+  using namespace std::literals;
+
   void player::setup_scripting( sol::usertype<player>& player_type, sol::state& lua)
   {
     // make usertype metatable
@@ -59,12 +61,11 @@ namespace mudpp
 
   void player::process_input(std::string const& input)
   {
-    using namespace std::literals;
     current_state_ = game_context_.call<int>("process_input"sv, current_state_, *this, input);
   }
 
-  void player::disconnect()                   { session_.disconnect();        }
-  void player::shutdown()                     { game_context_.shutdown();     }
+  void player::disconnect() { session_.disconnect();        }
+  void player::shutdown()   { game_context_.shutdown();     }
 
   void player::send( std::string const& msg, bool use_color )
   {
@@ -73,7 +74,11 @@ namespace mudpp
     if(current_state_ == 50) session_.send(colorize("#b>##"));
   }
 
-  void player::tick() { if(current_state_ == 50) send(info("\n**TICK**")); }
+  void player::tick()
+  {
+    if(current_state_ == 50)
+      send(info("\n**TICK**"sv));
+  }
 
   void player::enter(int id)
   {
@@ -84,8 +89,8 @@ namespace mudpp
     }
     else
     {
-      game_context_.log(std::cerr,"PLAYER") << name_ << " tried to access room #" << id
-                                            << " which is not registered.";
+      game_context_.log(std::cerr,"PLAYER") << name_ << " tried to access room #"sv << id
+                                            << " which is not registered."sv;
       send("Where are you going ?\n");
     }
   }
@@ -119,14 +124,14 @@ namespace mudpp
   void player::save()
   {
     auto path = game_context_.paths()["saves"]  + name_ + ".player";
-    game_context_.log(std::cout,"PLAYER") << "Saving character to: "  << path << std::endl;
+    game_context_.log(std::cout,"PLAYER") << "Saving character to: "sv  << path << std::endl;
     std::ofstream file( path.c_str() );
 
-    file << "--\n";
-    file << "-- MUDPP SAVE FILE\n";
-    file << "--\n";
-    file << "player =  { name      = \"" << name_     << "\",\n";
-    file << "            password  = \"" << password_ << "\",\n";
-    file << "          }\n";
+    file << "--\n"sv;
+    file << "-- MUDPP SAVE FILE\n"sv;
+    file << "--\n"sv;
+    file << "player =  { name      = \""sv << name_     << "\",\n"sv;
+    file << "            password  = \""sv << password_ << "\",\n"sv;
+    file << "          }\n"sv;
   }
 }

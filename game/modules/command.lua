@@ -46,8 +46,14 @@ function command.look(current_player, args, states)
       local dir  = command.direction_map[target]
       local next_room = current_player:location()
       next_room = next_room:go(dir)
-      local new_room = game.find_room(next_room)
-      current_player:send("In this direction, you see " .. new_room.name .. "\n", true)
+      if(next_room ~= -1) then
+        local new_room = game.find_room(next_room)
+        current_player:send("In this direction, you see " .. new_room.name .. "\n", true)
+      else
+        current_player:send("There is nothing to look at there\n")
+      end
+    else
+      current_player:send("There is nothing to look at there\n")
     end
   end
   return states["play"]
