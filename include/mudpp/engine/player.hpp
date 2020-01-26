@@ -18,6 +18,7 @@
 namespace mudpp
 {
   struct game;
+  struct room;
 
   struct player
   {
@@ -32,6 +33,11 @@ namespace mudpp
     void process_input(std::string const& input);
     void send( std::string const& msg, bool use_color = true );
 
+    void go(int direction);
+
+    void enter(int id);
+    void exit();
+
     std::string const&  name() const { return name_; }
     void                set_name(std::string const& n) { name_ = n; }
     std::string const&  password() const { return password_; }
@@ -40,8 +46,8 @@ namespace mudpp
     int current_state()     const { return current_state_;  }
     void  set_state(int s)        { current_state_ = s;     }
 
-    bool is_connected() const { return current_state_ != 6; }
-    bool is_logged()    const { return current_state_ == 5; }
+    bool is_connected() const { return current_state_ != 60; }
+    bool is_logged()    const { return current_state_ == 50; }
 
     static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
@@ -52,6 +58,7 @@ namespace mudpp
     game&       game_context_;
     int         current_state_;
     std::string name_, password_;
+    room*       current_room_;
   };
 
   using player_t = std::unique_ptr<player>;

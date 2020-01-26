@@ -10,8 +10,10 @@ add_library ( mupp
               game.cpp
               io.cpp
               player.cpp
+              room.cpp
               session.cpp
               session_manager.cpp
+              zone.cpp
             )
 
 if( MSVC )

@@ -6,6 +6,28 @@ local command = {}
 ----------------------------------------------------------------------------------------------------
 -- Load modules
 ----------------------------------------------------------------------------------------------------
+utils   = require "utils"
+
+----------------------------------------------------------------------------------------------------
+-- go command
+----------------------------------------------------------------------------------------------------
+function command.go(current_player, cmd, args, states)
+  local dmap  = { ["N"] = 0, ["NORTH"] = 0
+                , ["S"] = 1, ["SOUTH"] = 1
+                , ["E"] = 2, ["EAST" ] = 2
+                , ["W"] = 3, ["WEST" ] = 3
+                , ["U"] = 4, ["UP"   ] = 4
+                , ["D"] = 5, ["DOWN" ] = 5
+                }
+
+  local direction = string.upper(args[1])
+
+  if(utils.contain_key(dmap,direction)) then
+    current_player:go(dmap[direction])
+  end
+
+  return states["play"]
+end
 
 ----------------------------------------------------------------------------------------------------
 -- Quit command
@@ -29,9 +51,13 @@ end
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
 function command.unknown(current_player, cmd, args, states)
-  current_player:send("I don't understand. What do you mean by '@r#b".. cmd .."##' ?\n", true)
+  if(not utils.is_empty(cmd)) then
+    current_player:send("I don't understand. What do you mean by '@r#b".. cmd .."##' ?\n", true)
+  end
+
   return states["play"]
 end
+
 
 ----------------------------------------------------------------------------------------------------
 -- Command repository
@@ -40,6 +66,7 @@ command.supported_commands =
 {
   ["/SHUTDOWN"] = { callback=command.shutdown , permission="" },
   ["/QUIT"]     = { callback=command.quit     , permission="" },
+  ["GO"]        = { callback=command.go       , permission="" },
   ["~"]         = { callback=command.unknown  , permission="" }
 }
 

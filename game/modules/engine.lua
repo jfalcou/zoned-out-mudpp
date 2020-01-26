@@ -13,10 +13,10 @@ require "table"
 ----------------------------------------------------------------------------------------------------
 -- In-game states table
 ----------------------------------------------------------------------------------------------------
-engine.state =  { login = 0 , load_player = 1 , check_password = 2
-                            , new_player  = 3 , ask_password    = 4
-                , play = 5
-                , disconnected = 6
+engine.state =  { login = 0 , load_player = 10 , check_password = 11
+                            , new_player  = 20 , ask_password   = 21
+                , play = 50
+                , disconnected = 60
                 }
 
 ----------------------------------------------------------------------------------------------------
@@ -74,6 +74,8 @@ function engine.check_password(current_player, input)
     return engine.state["check_password"]
   else
     current_player:send( messages["returning_player"] )
+    current_player:enter(0)
+
     return engine.state["play"]
   end
 end
@@ -104,6 +106,8 @@ function engine.ask_password(current_player, input)
 
     current_player:save();
     current_player:send( messages["new_player"] );
+
+    current_player:enter(0)
 
     return engine.state["play"]
   end

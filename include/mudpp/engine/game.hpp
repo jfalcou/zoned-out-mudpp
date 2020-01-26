@@ -12,6 +12,8 @@
 
 #include <mudpp/system/session_manager.hpp>
 #include <mudpp/engine/player.hpp>
+#include <mudpp/engine/room.hpp>
+#include <mudpp/engine/zone.hpp>
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
 #include <string_view>
@@ -32,6 +34,8 @@ namespace mudpp
     void shutdown();
 
     void broadcast(std::string const& message, bool use_color);
+
+    room*   find_room(int id);
 
     player* find_player(std::string const& name);
     player* attach_player(session&);
@@ -56,7 +60,9 @@ namespace mudpp
       events_.push_back( periodic_event::make(ios_, period, f) );
     }
 
+
     private:
+    void load_zones();
 
     // NETWORK
     boost::asio::io_service                         ios_;
@@ -64,12 +70,15 @@ namespace mudpp
     std::vector<player_t>                           players_;
     sol::nested<std::map<std::string, std::string>> paths_;
     sol::nested<std::map<std::string, std::string>> messages_;
+    std::map<int, zone>                             zones_;
     std::unique_ptr<mudpp::session_manager>         sessions_;
 
     // LUA
     void setup_scripting( std::string const& config_file );
     sol::state                                      lua_state_;
     sol::usertype<player>                           player_type_;
+    sol::usertype<room>                             room_type_;
+    sol::usertype<zone>                             zone_type_;
     sol::table                                      system_module_;
 
     // GAME

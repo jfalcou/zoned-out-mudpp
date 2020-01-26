@@ -4,6 +4,19 @@
 local utils = {}
 
 ----------------------------------------------------------------------------------------------------
+-- String shortcut syntax for sub string/indexing
+----------------------------------------------------------------------------------------------------
+getmetatable('').__index = function(str,i) return string.sub(str,i,i) end
+
+getmetatable('').__call = function(str,i,j)
+  if type(i)~='table' then return string.sub(str,i,j)
+    else local t={}
+    for k,v in ipairs(i) do t[k]=string.sub(str,v,v) end
+    return table.concat(t)
+    end
+  end
+
+----------------------------------------------------------------------------------------------------
 -- Check a file exists
 ----------------------------------------------------------------------------------------------------
 function utils.file_exists(name)

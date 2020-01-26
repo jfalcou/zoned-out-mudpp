@@ -59,6 +59,24 @@ namespace mudpp
     return (p != players_.end()) ? p->get() : nullptr;
   }
 
+  void game::load_zones()
+  {
+    std::string zones  = paths()["asset"];
+                zones += "zones.lua";
+
+    lua_state_.script_file( zones.c_str() );
+    sol::table zs = lua_state_["zones"];
+
+    for (auto it : zs)
+    {
+      int        id = it.first.as<int>();
+      sol::table z  = it.second.as<sol::table>();
+      zones_.insert({ id, zone(*this,id,z)});
+    }
+
+    log(std::cout,"GAME") << "Loaded: " << zones_.size() << " zones." << std::endl;
+  }
+
   bool game::run()
   {
     log(std::cout,"GAME") << "Start..." << std::endl;
@@ -72,8 +90,12 @@ namespace mudpp
     // Display network stats
     register_event( lua_state_["stats_period"], [this]() { sessions_->stats(); } );
 
+    // Load zones
+    load_zones();
+
     try
     {
+
       // Start the game
       auto tic = std::chrono::high_resolution_clock::now();
 
@@ -182,7 +204,10 @@ namespace mudpp
     period_     = lua_state_["base_period"];
 
     // Perform scripting setup for other types
-    player::setup_scripting(player_type_, lua_state_);
+    player::setup_scripting (player_type_ , lua_state_);
+    room::setup_scripting   (room_type_   , lua_state_);
+    zone::setup_scripting   (zone_type_   , lua_state_);
+
     lua_state_.script_file( paths()["player"].c_str() );
   }
 
@@ -207,4 +232,21 @@ namespace mudpp
 
     return p.get();
   }
+
+  room* game::find_room(int id)
+  {
+    int zone_id = id / 1000;
+    int room_id = id % 1000;
+
+    auto z = zones_.find(zone_id);
+    if(z != zones_.end())
+    {
+      return z->second.find_room(room_id);
+    }
+    else
+    {
+      return nullptr;
+    }
+  }
+
 }
