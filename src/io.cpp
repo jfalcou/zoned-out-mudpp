@@ -57,20 +57,20 @@ namespace mudpp
             case 'y' : output_os << termcolor::yellow;  break;
             case 'c' : output_os << termcolor::cyan;    break;
             case 'm' : output_os << termcolor::magenta; break;
-            default: break;
+            default  : output_os << '@' << opt;         break;
           }
         }
         else if(m == mode::background)
         {
           switch(opt)
           {
-            case 'r' : output_os << termcolor::on_red;     break;
-            case 'g' : output_os << termcolor::on_green;   break;
-            case 'b' : output_os << termcolor::on_blue;    break;
-            case 'y' : output_os << termcolor::on_yellow;  break;
-            case 'c' : output_os << termcolor::on_cyan;    break;
-            case 'm' : output_os << termcolor::on_magenta; break;
-            default: break;
+            case 'r' : output_os << termcolor::on_red;      break;
+            case 'g' : output_os << termcolor::on_green;    break;
+            case 'b' : output_os << termcolor::on_blue;     break;
+            case 'y' : output_os << termcolor::on_yellow;   break;
+            case 'c' : output_os << termcolor::on_cyan;     break;
+            case 'm' : output_os << termcolor::on_magenta;  break;
+            default  : output_os << '$' << opt;             break;
           }
         }
         else
@@ -85,7 +85,7 @@ namespace mudpp
             case 's' : output_os << termcolor::crossed;   break;
             case 'r' : output_os << termcolor::reverse;   break;
             case '#' : output_os << termcolor::reset;     break;
-            default: break;
+            default  : output_os << '#' << opt;           break;
           }
         }
         curr++;
