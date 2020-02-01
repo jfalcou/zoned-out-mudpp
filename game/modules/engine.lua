@@ -15,6 +15,7 @@ require "table"
 ----------------------------------------------------------------------------------------------------
 engine.state =  { login = 0 , load_player = 10 , check_password = 11
                             , new_player  = 20 , ask_password   = 21
+                , select_race = 30, select_class = 31
                 , play = 50
                 , disconnected = 60
                 }
@@ -74,39 +75,6 @@ function engine.check_password(current_player, input)
     return engine.state["check_password"]
   else
     current_player:send( messages["returning_player"] )
-    current_player:enter(0)
-
-    return engine.state["play"]
-  end
-end
-
-----------------------------------------------------------------------------------------------------
--- Create new character
-----------------------------------------------------------------------------------------------------
-function engine.create_player(current_player, input)
-  if( utils.is_empty(input) ) then
-    return engine.state["new_player"]
-  else
-    current_player.name = input
-    current_player:send("Welcome @y#b" .. input .. "## !\n", true )
-    current_player:send("@y#bChoose a password:## \n", true )
-    return engine.state["ask_password"]
-  end
-end
-
-----------------------------------------------------------------------------------------------------
--- Create new character's password
-----------------------------------------------------------------------------------------------------
-function engine.ask_password(current_player, input)
-  if( utils.is_empty(input) ) then
-    return engine.state["ask_password"]
-  else
-    current_player.password = input
-    current_player:send("Your password is: " .. input .. "\n")
-
-    current_player:save();
-    current_player:send( messages["new_player"] );
-
     current_player:enter(0)
 
     return engine.state["play"]
