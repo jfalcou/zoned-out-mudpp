@@ -187,6 +187,27 @@ namespace mudpp
                                 , [&](std::string const& s) { return colorize(s); }
                                 );
 
+    // Broadcast message to a player in a room
+    system_module_.set_function ( "say"
+                                , [&](std::string const& tgt, std::string const& s, bool use_color)
+                                  {
+                                    auto p = find_player(tgt);
+                                    if(p) p->send(s,use_color);
+                                    return p != nullptr;
+                                  }
+                                );
+
+
+    // Broadcast message to all player in a room
+    system_module_.set_function ( "yell"
+                                , [&](room const& r, std::string const& s, bool use_color)
+                                  {
+                                    auto const& all_players = r.attendees();
+                                    for(auto p : all_players)
+                                      p->send(s,use_color);
+                                  }
+                                );
+
     // Broadcast message to all connected players
     system_module_.set_function ( "broadcast"
                                 , [&](std::string const& s, bool use_color)

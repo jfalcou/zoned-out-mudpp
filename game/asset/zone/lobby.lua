@@ -13,7 +13,11 @@ lobby = { start = 0
                   , [1] = { name = "a wooden corridor"
                           , desc = "A corridor made of exotic wood is subtly lighted by "
                                 .. "various candles. It leads to a #b@ybedroom## south."
-                          , exit = {s=0}
+                          , exit = {s=0,n=2}
+                          }
+                  , [2] = { name = "the inn main room"
+                          , desc = "A lively, full of noises and music room. It's warm and inviting."
+                          , exit = {s=1}
                           }
                   }
         }

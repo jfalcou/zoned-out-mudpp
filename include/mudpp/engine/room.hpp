@@ -34,9 +34,10 @@ namespace mudpp
     void  on_exit(player*);
     int   go(int direction) const;
 
-    int                 id()          const noexcept { return id_; }
-    std::string const&  name()        const noexcept { return name_; }
-    std::string const&  description() const noexcept { return description_; }
+    int                       id()          const noexcept { return id_; }
+    std::string const&        name()        const noexcept { return name_; }
+    std::string const&        description() const noexcept { return description_; }
+    std::set<player*> const&  attendees()   const noexcept { return attendees_; }
 
     void set_id(int id)                         { id_ = id; }
     void set_name(std::string const& n)         { name_ = n; }

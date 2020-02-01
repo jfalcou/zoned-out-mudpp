@@ -43,15 +43,15 @@ function command.look(current_player, args, states)
     local target = string.upper(args[1])
 
     if(utils.contain_key(command.direction_map,target)) then
-      local dir  = command.direction_map[target]
-      local next_room = current_player:location()
-      next_room = next_room:go(dir)
+      local dir       = command.direction_map[target]
+      local next_room = current_player:location():go(dir)
       if(next_room ~= -1) then
         local new_room = game.find_room(next_room)
         current_player:send("In this direction, you see " .. new_room.name .. "\n", true)
       else
         current_player:send("There is nothing to look at there\n")
       end
+      -- elseif( ??? ) Other case ? like mob or items ?
     else
       current_player:send("There is nothing to look at there\n")
     end
@@ -69,6 +69,37 @@ function command.quit(current_player, args, states)
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Yell command
+----------------------------------------------------------------------------------------------------
+function command.yell(current_player, args, states)
+  local msg = "@y#b".. current_player.name .. "## yells ''"
+  for _,value in pairs(args) do msg = msg .. " " .. value end
+
+  game.yell ( current_player:location(), msg .. " ##''\n", true )
+
+  return states["play"]
+end
+
+----------------------------------------------------------------------------------------------------
+-- Say command
+----------------------------------------------------------------------------------------------------
+function command.say(current_player, args, states)
+  local other_player = args[1]
+  table.remove(args,1)
+
+  local msg = "@y#b".. current_player.name .. "## says ''"
+  for _,value in pairs(args) do msg = msg .. " " .. value end
+
+  local ok = game.say(other_player, msg .."## ''\n", true)
+
+  if(not ok) then
+    current_player:send(other_player .. " is not nearby.\n")
+  end
+
+  return states["play"]
+end
+
+----------------------------------------------------------------------------------------------------
 -- Shutdown command
 ----------------------------------------------------------------------------------------------------
 function command.shutdown(current_player, args, states)
@@ -81,10 +112,7 @@ end
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
 function command.unknown(current_player, args, states)
-  if(not utils.is_empty(cmd)) then
-    current_player:send("What do you mean ?\n", false)
-  end
-
+  current_player:send("What do you mean ?\n", false)
   return states["play"]
 end
 
@@ -114,6 +142,11 @@ command.supported_commands =
   -- Actions
   --------------------------------------------------------------------------------------------------
   ["LOOK"]      = { op = command.look, flags = "" },
+  --------------------------------------------------------------------------------------------------
+  -- In-Game communication
+  --------------------------------------------------------------------------------------------------
+  ["YELL"]      = { op = command.yell, flags = "" },
+  ["SAY"]       = { op = command.say, flags = "" },
   --------------------------------------------------------------------------------------------------
   ["~"]         = { op = command.unknown  , flags = "" }
 }
