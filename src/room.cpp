@@ -19,7 +19,7 @@ namespace mudpp
   room::room(game& g, int id, sol::table const& data)
       : game_context_(g)
       , attendees_{}
-      , name_(data["name"]), description_(std::string(data["desc"])+"\n")
+      , name_(data["name"].get<std::string>()), description_(std::string(data["desc"].get<std::string>())+"\n")
       , id_(id)
   {
     sol::table e = data["exit"];

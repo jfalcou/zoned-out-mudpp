@@ -17,7 +17,7 @@ namespace mudpp
 
   zone::zone(game& g, int id, sol::table const& data)
       : game_context_(g)
-      , name_(data["name"]), description_(data["desc"])
+      , name_(data["name"].get<std::string>()), description_(data["desc"].get<std::string>())
       , id_(id)
       , start_room_(data["start"])
   {
