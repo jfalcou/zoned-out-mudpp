@@ -55,6 +55,7 @@ function engine.load_player(current_player, input)
   if( utils.file_exists(savegame_path) ) then
     game.log('Loading ' .. savegame_path)
     dofile(savegame_path)
+    current_player.data     = player["data"]
     current_player.password = player["password"]
     current_player:send("#b@yPassword:## ", true )
     return engine.state["check_password"]
@@ -74,7 +75,7 @@ function engine.check_password(current_player, input)
     current_player:send("#b@yPassword:## ", true )
     return engine.state["check_password"]
   else
-    current_player:send( messages["returning_player"] )
+    current_player:send( messages["returning_player"], true )
     current_player:enter(0)
 
     return engine.state["play"]

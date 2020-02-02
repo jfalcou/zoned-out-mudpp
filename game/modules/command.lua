@@ -64,7 +64,12 @@ end
 ----------------------------------------------------------------------------------------------------
 function command.quit(current_player, args, states)
   game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n", true )
+
+  local dump = utils.dump_table(current_player.data,"data")
+
+  current_player:save(dump)
   current_player:disconnect()
+
   return states["disconnected"]
 end
 
@@ -93,7 +98,7 @@ function command.say(current_player, args, states)
   local ok = game.say(other_player, msg .."## ''\n", true)
 
   if(not ok) then
-    current_player:send(other_player .. " is not nearby.\n")
+    current_player:send(other_player .. " is not nearby.\n", true)
   end
 
   return states["play"]
