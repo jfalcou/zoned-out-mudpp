@@ -23,7 +23,7 @@ engine.state =  { login = 0 , load_player = 10 , check_password = 11
 ----------------------------------------------------------------------------------------------------
 -- Process player's login
 ----------------------------------------------------------------------------------------------------
-function engine.process_login(player, input)
+function engine.process_login(current_player, input)
   local commands =
   {
     ["L"] = {prompt="#b@yCharacter name:## "            , out="load_player" },
@@ -33,7 +33,7 @@ function engine.process_login(player, input)
 
   local c = utils.select_command(commands,input)
 
-  player:send(c.prompt, true)
+  current_player:send(c.prompt, true)
   return engine.state[c.out]
 end
 
