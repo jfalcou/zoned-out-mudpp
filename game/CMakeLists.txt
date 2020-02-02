@@ -6,4 +6,4 @@
 ##  SPDX-License-Identifier: MIT
 ##==================================================================================================
 
-add_demo( "mupp" game.cpp )
+add_demo( "mudpp" game.cpp )
