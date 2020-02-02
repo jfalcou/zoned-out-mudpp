@@ -64,6 +64,14 @@ namespace mudpp
     private:
     void load_zones();
 
+    // LUA
+    void setup_scripting( std::string const& config_file );
+    sol::state                                      lua_state_;
+    sol::usertype<player>                           player_type_;
+    sol::usertype<room>                             room_type_;
+    sol::usertype<zone>                             zone_type_;
+    sol::table                                      system_module_;
+
     // NETWORK
     boost::asio::io_service                         ios_;
     std::vector<periodic_event_t>                   events_;
@@ -72,14 +80,6 @@ namespace mudpp
     sol::nested<std::map<std::string, std::string>> messages_;
     std::map<int, zone>                             zones_;
     std::unique_ptr<mudpp::session_manager>         sessions_;
-
-    // LUA
-    void setup_scripting( std::string const& config_file );
-    sol::state                                      lua_state_;
-    sol::usertype<player>                           player_type_;
-    sol::usertype<room>                             room_type_;
-    sol::usertype<zone>                             zone_type_;
-    sol::table                                      system_module_;
 
     // GAME
     void cleanup();

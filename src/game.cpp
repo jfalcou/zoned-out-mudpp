@@ -95,7 +95,6 @@ namespace mudpp
 
     try
     {
-
       // Start the game
       auto tic = std::chrono::high_resolution_clock::now();
 

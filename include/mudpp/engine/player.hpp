@@ -58,8 +58,8 @@ namespace mudpp
     static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
     private:
-    session&      session_;
     property_map  properties_;
+    session&      session_;
     game&         game_context_;
     int           current_state_;
     std::string   name_, password_;
