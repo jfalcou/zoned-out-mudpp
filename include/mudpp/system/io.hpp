@@ -17,7 +17,7 @@ namespace mudpp
   {
     std::ostringstream stream;
     stream  << termcolor::colorize << termcolor::red << termcolor::bold
-            << data << termcolor::reset << '\n';
+            << data << termcolor::reset << std::endl;
 
     return stream.str();
   }
@@ -26,7 +26,7 @@ namespace mudpp
   {
     std::ostringstream stream;
     stream  << termcolor::colorize << termcolor::yellow << termcolor::bold
-            << data << termcolor::reset << '\n';
+            << data << termcolor::reset << std::endl;
 
     return stream.str();
   }

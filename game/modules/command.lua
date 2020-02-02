@@ -25,7 +25,7 @@ function command.go(current_player, args, states)
   if(utils.contain_key(command.direction_map,direction)) then
     current_player:go(command.direction_map[direction])
   else
-    current_player:send("Where are you going ?\n")
+    current_player:send("Where are you going ?\n\r")
   end
 
   return states["play"]
@@ -47,13 +47,13 @@ function command.look(current_player, args, states)
       local next_room = current_player:location():go(dir)
       if(next_room ~= -1) then
         local new_room = game.find_room(next_room)
-        current_player:send("In this direction, you see " .. new_room.name .. "\n", true)
+        current_player:send("In this direction, you see " .. new_room.name .. "\n\r", true)
       else
-        current_player:send("There is nothing to look at there\n")
+        current_player:send("There is nothing to look at there\n\r")
       end
       -- elseif( ??? ) Other case ? like mob or items ?
     else
-      current_player:send("There is nothing to look at there\n")
+      current_player:send("There is nothing to look at there\n\r")
     end
   end
   return states["play"]
@@ -63,7 +63,7 @@ end
 -- Quit command
 ----------------------------------------------------------------------------------------------------
 function command.quit(current_player, args, states)
-  game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n", true )
+  game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n\r", true )
 
   local dump = utils.dump_table(current_player.data,"data")
 
@@ -80,7 +80,7 @@ function command.yell(current_player, args, states)
   local msg = "@y#b".. current_player.name .. "## yells ''"
   for _,value in pairs(args) do msg = msg .. " " .. value end
 
-  game.yell ( current_player:location(), msg .. " ##''\n", true )
+  game.yell ( current_player:location(), msg .. " ##''\n\r", true )
 
   return states["play"]
 end
@@ -95,10 +95,10 @@ function command.say(current_player, args, states)
   local msg = "@y#b".. current_player.name .. "## says ''"
   for _,value in pairs(args) do msg = msg .. " " .. value end
 
-  local ok = game.say(other_player, msg .."## ''\n", true)
+  local ok = game.say(other_player, msg .."## ''\n\r", true)
 
   if(not ok) then
-    current_player:send(other_player .. " is not nearby.\n", true)
+    current_player:send(other_player .. " is not nearby.\n\r", true)
   end
 
   return states["play"]
@@ -108,7 +108,7 @@ end
 -- Shutdown command
 ----------------------------------------------------------------------------------------------------
 function command.shutdown(current_player, args, states)
-  game.broadcast( "@r#bThe server will now shutdown ...##\n", true )
+  game.broadcast( "@r#bThe server will now shutdown ...##\n\r", true )
   current_player:shutdown()
   return states["disconnected"]
 end
@@ -117,7 +117,7 @@ end
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
 function command.unknown(current_player, args, states)
-  current_player:send("What do you mean ?\n", false)
+  current_player:send("What do you mean ?\n\r", false)
   return states["play"]
 end
 

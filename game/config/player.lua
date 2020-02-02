@@ -26,12 +26,12 @@ function player.create_player(current_player, input)
     if( string.find(input, '^[a-zA-Z0-9_]+$') ~= nil ) then
       current_player.name = input
       current_player.data = {}
-      current_player:send("Welcome @y#b" .. input .. "## !\n", true )
-      current_player:send("@y#bChoose a password:## \n", true )
+      current_player:send("Welcome @y#b" .. input .. "## !\n\r", true )
+      current_player:send("@y#bChoose a password:## \n\r", true )
 
       return engine.state["ask_password"]
     else
-      current_player:send (   "The name @y" .. input .. "## is invalid.\n"
+      current_player:send (   "The name @y" .. input .. "## is invalid.\n\r"
                           ..  "@y#bCharacter name:## ", true
                           )
 
@@ -48,7 +48,7 @@ function player.ask_password(current_player, input)
     return engine.state["ask_password"]
   else
     current_player.password = input
-    current_player:send("Your password is: " .. input .. "\n")
+    current_player:send("Your password is: " .. input .. "\n\r")
 
     current_player:save();
     current_player:send( messages["new_player"] );

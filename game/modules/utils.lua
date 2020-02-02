@@ -41,7 +41,7 @@ end
 function utils.dump_table(node,name)
   local cache, stack, output = {},{},{}
   local depth = 1
-  local output_str = name .. " = {\n"
+  local output_str = name .. " = {\n\r"
 
   while true do
     local size = 0
@@ -54,9 +54,9 @@ function utils.dump_table(node,name)
       if (cache[node] == nil) or (cur_index >= cache[node]) then
 
         if (string.find(output_str,"}",output_str:len())) then
-          output_str = output_str .. ",\n"
-        elseif not (string.find(output_str,"\n",output_str:len())) then
-          output_str = output_str .. "\n"
+          output_str = output_str .. ",\n\r"
+        elseif not (string.find(output_str,"\n\r",output_str:len())) then
+          output_str = output_str .. "\n\r"
         end
 
         -- This is necessary for working with HUGE tables otherwise
@@ -74,7 +74,7 @@ function utils.dump_table(node,name)
         if (type(v) == "number" or type(v) == "boolean") then
           output_str = output_str .. string.rep(' ',12*depth) .. key .. " = "..tostring(v)
         elseif (type(v) == "table") then
-          output_str = output_str .. string.rep(' ',12*depth) .. key .. " = {\n"
+          output_str = output_str .. string.rep(' ',12*depth) .. key .. " = {\n\r"
           table.insert(stack,node)
           table.insert(stack,v)
           cache[node] = cur_index+1
@@ -84,14 +84,14 @@ function utils.dump_table(node,name)
         end
 
         if (cur_index == size) then
-          output_str = output_str .. "\n" .. string.rep(' ',12*(depth-1)) .. "}"
+          output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
         else
           output_str = output_str .. ","
         end
       else
         -- close the table
         if (cur_index == size) then
-          output_str = output_str .. "\n" .. string.rep(' ',12*(depth-1)) .. "}"
+          output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
         end
       end
 
@@ -99,7 +99,7 @@ function utils.dump_table(node,name)
     end
 
     if (size == 0) then
-      output_str = output_str .. "\n" .. string.rep(' ',12*(depth-1)) .. "}"
+      output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
     end
 
     if (#stack > 0) then

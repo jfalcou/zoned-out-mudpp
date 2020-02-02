@@ -28,7 +28,7 @@ function engine.process_login(player, input)
   {
     ["L"] = {prompt="#b@yCharacter name:## "            , out="load_player" },
     ["C"] = {prompt="#b@yCharacter name:## "            , out="new_player"  },
-    ["~"] = {prompt="##Sorry, your choice is invalid.\n", out="login"       }
+    ["~"] = {prompt="##Sorry, your choice is invalid.\n\r", out="login"       }
   }
 
   local c = utils.select_command(commands,input)
@@ -47,7 +47,7 @@ function engine.load_player(current_player, input)
 
   if( game.player_exists(current_player) )  then
     game.log('Load player - ' .. input .. ' already logged.')
-    current_player:send("@y#b" .. input .. "## is already logged in.\n", true)
+    current_player:send("@y#b" .. input .. "## is already logged in.\n\r", true)
     current_player:prompt()
     return engine.state["login"]
   end
@@ -61,7 +61,7 @@ function engine.load_player(current_player, input)
     return engine.state["check_password"]
   else
     game.log('Unknown player ' .. input)
-    current_player:send( "@rUnknown player @y" .. input .. "##\n" .. "@y#bCharacter name:## ", true )
+    current_player:send( "@rUnknown player @y" .. input .. "##\n\r" .. "@y#bCharacter name:## ", true )
     return engine.state["load_player"]
   end
 end
@@ -71,7 +71,7 @@ end
 ----------------------------------------------------------------------------------------------------
 function engine.check_password(current_player, input)
   if(current_player.password ~= input) then
-    current_player:send("@rIncorrect password.##\n", true )
+    current_player:send("@rIncorrect password.##\n\r", true )
     current_player:send("#b@yPassword:## ", true )
     return engine.state["check_password"]
   else
