@@ -1,6 +1,6 @@
 # MUD++ - C++17 Simple MUD Engine
 
-MUD++ is a small attempt at building a C++117, modern version of a MUD server engine.
+MUD++ is a small attempt at building a C++17, modern version of a MUD server engine.
 Consider it half-serious (I wish it can ends up playable & played) and educationnal.
 
 This is heavily under construction: EVERYTHING MAY CHANGES AT ANY TIME !!!
