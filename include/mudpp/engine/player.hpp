@@ -10,6 +10,7 @@
 #ifndef MUDPP_ENGINE_PLAYER_HPP_INCLUDED
 #define MUDPP_ENGINE_PLAYER_HPP_INCLUDED
 
+#include <mudpp/system/property_map.hpp>
 #include <mudpp/system/session.hpp>
 #include <sol/sol.hpp>
 #include <string>
@@ -29,7 +30,7 @@ namespace mudpp
     void shutdown();
     void disconnect();
     void login_prompt();
-    void save();
+    void save(std::string const& data);
     void process_input(std::string const& input);
     void send( std::string const& msg, bool use_color = true );
 
@@ -38,14 +39,18 @@ namespace mudpp
     void enter(int id);
     void exit();
 
-    room const& location() const { return *current_room_; }
+    std::size_t length() const                                { return properties_.length();  }
+    void set(std::string const& key, sol::stack_object value) { properties_.set(key,value);   }
+    sol::object get(std::string const& key) const             { return properties_.get(key);  }
+
+    room const&         location() const { return *current_room_; }
     std::string const&  name() const { return name_; }
     void                set_name(std::string const& n) { name_ = n; }
     std::string const&  password() const { return password_; }
     void                set_password(std::string const& p) { password_ = p; }
 
-    int current_state()     const { return current_state_;  }
-    void  set_state(int s)        { current_state_ = s;     }
+    int   current_state()     const { return current_state_;  }
+    void  set_state(int s)          { current_state_ = s;     }
 
     bool is_connected() const { return current_state_ != 60; }
     bool is_logged()    const { return current_state_ == 50; }
@@ -53,13 +58,12 @@ namespace mudpp
     static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
     private:
-    void save_player();
-
-    session&    session_;
-    game&       game_context_;
-    int         current_state_;
-    std::string name_, password_;
-    room*       current_room_;
+    session&      session_;
+    property_map  properties_;
+    game&         game_context_;
+    int           current_state_;
+    std::string   name_, password_;
+    room*         current_room_;
   };
 
   using player_t = std::unique_ptr<player>;

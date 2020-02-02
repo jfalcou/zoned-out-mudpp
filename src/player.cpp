@@ -21,7 +21,12 @@ namespace mudpp
   void player::setup_scripting( sol::usertype<player>& player_type, sol::state& lua)
   {
     // make usertype metatable
-    player_type = lua.new_usertype<player>("player");
+    player_type = lua.new_usertype<player>( "player"
+                                          , sol::meta_function::index     , &player::get
+                                          , sol::meta_function::new_index , &player::set
+                                          , sol::meta_function::length    , &player::length
+                                          );
+
     player_type["tick"]         = &player::tick;
     player_type["shutdown"]     = &player::shutdown;
     player_type["disconnect"]   = &player::disconnect;
@@ -64,7 +69,7 @@ namespace mudpp
     current_state_ = game_context_.call<int>("process_input"sv, current_state_, *this, input);
   }
 
-  void player::disconnect() { session_.disconnect();        }
+  void player::disconnect() { session_.disconnect(); }
   void player::shutdown()   { game_context_.shutdown();     }
 
   void player::send( std::string const& msg, bool use_color )
@@ -121,7 +126,7 @@ namespace mudpp
     }
   }
 
-  void player::save()
+  void player::save(std::string const& data)
   {
     auto path = game_context_.paths()["saves"]  + name_ + ".player";
     game_context_.log(std::cout,"PLAYER") << "Saving character to: "sv  << path << std::endl;
@@ -132,6 +137,7 @@ namespace mudpp
     file << "--\n"sv;
     file << "player =  { name      = \""sv << name_     << "\",\n"sv;
     file << "            password  = \""sv << password_ << "\",\n"sv;
+    file << "            "sv << data;
     file << "          }\n"sv;
   }
 }
