@@ -82,7 +82,7 @@ namespace mudpp
   void player::tick()
   {
     if(current_state_ == 50)
-      send(info("\n\r**TICK**\n\r"sv));
+      send(info("\n\r**TICK**"sv));
   }
 
   void player::enter(int id)

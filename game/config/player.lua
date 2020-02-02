@@ -30,6 +30,7 @@ function create_player(current_player, input)
       else
         current_player.name = input
         current_player.data = {}
+
         current_player:send("Welcome @y#b" .. input .. "## !\n\r", true )
         current_player:send("@y#bChoose a password:## \n\r", true )
 
@@ -53,11 +54,12 @@ function ask_password(current_player, input)
     return engine.state["ask_password"]
   else
     current_player.password = input
-    current_player:send("Your password is: " .. input .. "\n\r")
+    current_player:send("Your password is: " .. input .. "\n\r", true)
 
-    current_player:save();
-    current_player:send( messages["new_player"] );
+    -- Save character before starting the game
+    current_player:save(utils.dump_table(current_player.data,"data"))
 
+    current_player:send( messages["new_player"], true );
     current_player:enter(0)
 
     return engine.state["play"]
