@@ -14,6 +14,7 @@
 #include <mudpp/engine/player.hpp>
 #include <mudpp/engine/room.hpp>
 #include <mudpp/engine/zone.hpp>
+#include <mudpp/deps/api.hpp>
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
 #include <string_view>
@@ -24,7 +25,7 @@ namespace mudpp
 {
   struct session;
 
-  struct game
+  struct MUDPP_API game
   {
     game( std::string const& config_file );
 

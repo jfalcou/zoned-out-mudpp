@@ -6,7 +6,7 @@
 ##  SPDX-License-Identifier: MIT
 ##==================================================================================================
 
-add_library ( mupp
+add_library ( mudpp SHARED
               game.cpp
               io.cpp
               player.cpp
@@ -19,10 +19,15 @@ add_library ( mupp
 if( MSVC )
   set( options /std:c++latest /W3 /EHsc)
 else()
-  set( options -std=c++17 -Wall -Wno-missing-braces )
+  set( options -std=c++17 -Wall -Wno-missing-braces -fvisibility=hidden)
 endif()
 
-target_include_directories(mupp
+add_library(mudpp::mudpp ALIAS mudpp)
+
+target_compile_options( mudpp PRIVATE ${options} )
+target_compile_definitions(mudpp PRIVATE MUDPP_API_EXPORTS=1)
+
+target_include_directories( mudpp
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -33,5 +38,3 @@ target_include_directories(mupp
         ${LUA_INCLUDE_DIR}
         ${Boost_INCLUDE_DIR}
 )
-
-target_compile_options( mupp PRIVATE ${options} )

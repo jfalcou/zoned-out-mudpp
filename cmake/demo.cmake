@@ -48,7 +48,7 @@ function(add_demo root)
                               )
 
     target_link_libraries ( ${test}
-                            mupp
+                            mudpp
                             ${MUPP_LIBRARIES}
                             Threads::Threads
                           )
