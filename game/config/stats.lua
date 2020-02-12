@@ -1,27 +1,27 @@
 ----------------------------------------------------------------------------------------------------
--- Basic option for MUDpp
+-- List of functions for managing players from outside
 ----------------------------------------------------------------------------------------------------
-local module_folder = "./modules/"
-package.path = module_folder .. "?.lua;" .. package.path
+----------------------------------------------------------------------------------------------------
+-- Stats module
+----------------------------------------------------------------------------------------------------
+local stats = {}
 
 ----------------------------------------------------------------------------------------------------
--- Path to MUD files
+-- Load modules
 ----------------------------------------------------------------------------------------------------
-path  = { asset   = "asset/"
-        , saves   = "saves/"
-        , strings = "config/strings.lua"
-        , player  = "modules/player.lua"
-        }
 
 ----------------------------------------------------------------------------------------------------
--- Default listening port
+-- List of playable races
 ----------------------------------------------------------------------------------------------------
-port = 4000
+stats.list =  { [0] = "sex"
+              , [1] = "hit_points"
+              , [2] = "mana_points"
+              , [3] = "class_lvl"
+              , [4] = "experience"
+              }
 
 ----------------------------------------------------------------------------------------------------
--- Internal timers intervals in millisecond
+game.log('Module stats - loaded')
 ----------------------------------------------------------------------------------------------------
-base_period    =   100  -- base period for event
-tick_period    =  5000  -- broadcast **TICK** every 5s
-cleanup_period =  1000  -- Cleanup system resources every 1s
-stats_period   = 10000  -- Display resources status every 10s
+
+return stats

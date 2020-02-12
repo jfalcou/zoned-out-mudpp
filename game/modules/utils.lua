@@ -139,6 +139,18 @@ function utils.contain_key(values, key)
 end
 
 ----------------------------------------------------------------------------------------------------
+-- Checks if a table contains a given value
+----------------------------------------------------------------------------------------------------
+function utils.contain_value(values, target)
+  for _, v in pairs(values) do
+    if v == target then
+      return true
+    end
+  end
+  return false
+end
+
+----------------------------------------------------------------------------------------------------
 -- Select a command from a command table
 ----------------------------------------------------------------------------------------------------
 function utils.select_command(commands,choice,case)
