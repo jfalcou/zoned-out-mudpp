@@ -49,11 +49,20 @@ namespace mudpp
     std::string const&  password() const { return password_; }
     void                set_password(std::string const& p) { password_ = p; }
 
-    int   current_state()     const { return current_state_;  }
-    void  set_state(int s)          { current_state_ = s;     }
+    std::string const&   current_state()  const { return current_state_;  }
+    void  set_state(std::string s)              { current_state_ = s;     }
 
-    bool is_connected() const { return current_state_ != 60; }
-    bool is_logged()    const { return current_state_ == 50; }
+    bool is_connected() const
+    {
+      using namespace std::literals;
+      return current_state_ != "disconnected"sv;
+    }
+
+    bool is_logged() const
+    {
+      using namespace std::literals;
+      return current_state_ == "play"sv;
+    }
 
     static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
@@ -61,7 +70,7 @@ namespace mudpp
     property_map  properties_;
     session&      session_;
     game&         game_context_;
-    int           current_state_;
+    std::string   current_state_;
     std::string   name_, password_;
     room*         current_room_;
   };

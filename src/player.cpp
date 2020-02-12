@@ -47,7 +47,7 @@ namespace mudpp
   player::player(session& s)
         : session_(s)
         , game_context_(s.context())
-        , current_state_(0)
+        , current_state_("login")
         , current_room_(0)
   {}
 
@@ -66,7 +66,7 @@ namespace mudpp
 
   void player::process_input(std::string const& input)
   {
-    current_state_ = game_context_.call<int>("process_input"sv, current_state_, *this, input);
+    current_state_ = game_context_.call<std::string>("process_input"sv, current_state_, *this, input);
   }
 
   void player::disconnect() { session_.disconnect(); }
@@ -76,12 +76,12 @@ namespace mudpp
   {
     if(use_color) session_.send(colorize(msg));
     else          session_.send(msg);
-    if(current_state_ == 50) session_.send(colorize("#b>##"));
+    if(current_state_ == "play") session_.send(colorize("#b>##"));
   }
 
   void player::tick()
   {
-    if(current_state_ == 50)
+    if(current_state_ == "play")
       send(info("\n\r**TICK**"sv));
   }
 
