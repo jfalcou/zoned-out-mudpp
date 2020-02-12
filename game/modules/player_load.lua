@@ -26,7 +26,7 @@ local sm_load_player =
 
                   if( game.player_exists(current_player) )  then
                     game.log('Load player - ' .. input .. ' already logged.')
-                    current_player:send("@y#b" .. input .. "## is already logged in.\n\r", true)
+                    current_player:send("@y#b" .. input .. "## is already logged in.\n\r")
                     current_player:prompt()
                     return "login"
                   end
@@ -36,13 +36,12 @@ local sm_load_player =
                     dofile(savegame_path)
                     current_player.data     = player["data"]
                     current_player.password = player["password"]
-                    current_player:send("#b@yPassword:## ", true )
+                    current_player:send("#b@yPassword:## ")
                     return "check_password"
                   else
                     game.log('Unknown player ' .. input)
                     current_player:send (   "@rUnknown player @y" .. input .. "##\n\r"
                                         ..  "@y#bCharacter name:## "
-                                        , true
                                         )
                     return "load_player"
                   end
@@ -53,11 +52,11 @@ local sm_load_player =
     {
       trigger = function(from,current_player,input)
                   if(current_player.password ~= input) then
-                    current_player:send("@rIncorrect password.##\n\r", true )
+                    current_player:send("@rIncorrect password.##\n\r")
                     current_player:send("#b@yPassword:## ", true )
                     return "check_password"
                   else
-                    current_player:send( messages["returning_player"], true )
+                    current_player:send( messages["returning_player"])
                     current_player:enter(0)
 
                     return "play"
@@ -68,7 +67,7 @@ local sm_load_player =
     ["~"] =
     {
       trigger = function(from,current_player,input)
-                  current_player:send("##Sorry, your choice is invalid.\n\r", true)
+                  current_player:send("##Sorry, your choice is invalid.\n\r")
                   return from
                 end
     }

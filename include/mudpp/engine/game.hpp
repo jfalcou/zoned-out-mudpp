@@ -34,7 +34,7 @@ namespace mudpp
     bool run();
     void shutdown();
 
-    void broadcast(std::string const& message, bool use_color);
+    void broadcast(std::string const& message);
 
     room*   find_room(int id);
 

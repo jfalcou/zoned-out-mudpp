@@ -133,10 +133,10 @@ namespace mudpp
     return true;
   }
 
-  void game::broadcast(std::string const& message, bool use_color)
+  void game::broadcast(std::string const& message)
   {
     std::for_each ( players_.begin(), players_.end()
-                  , [&](auto const& p) { if(p->is_connected()) p->send(message, use_color); }
+                  , [&](auto const& p) { if(p->is_connected()) p->send(message); }
                   );
   }
 
@@ -170,49 +170,38 @@ namespace mudpp
 
     // Provide access to game::log from LUA
     system_module_.set_function ( "log"
-                                , [&](std::string const& s)
-                                  {
-                                    log(std::cout,"LUA") << s << std::endl;
-                                  }
+                                , [&](std::string const& s) { log(std::cout,"LUA") << s << std::endl; }
                                 );
 
     // Provide access to game::exists from LUA
-    system_module_.set_function ( "player_exists"
-                                , [&](player const& p) { return exists( p ); }
-                                );
+    system_module_.set_function ( "player_exists", [&](player const& p) { return exists( p ); } );
 
     // Provide access to a "build a colored text" for lUA
-    system_module_.set_function ( "colorize"
-                                , [&](std::string const& s) { return colorize(s); }
-                                );
+    system_module_.set_function ( "colorize", [&](std::string const& s) { return colorize(s); } );
 
     // Broadcast message to a player in a room
     system_module_.set_function ( "say"
-                                , [&](std::string const& tgt, std::string const& s, bool use_color)
+                                , [&](std::string const& tgt, std::string const& s)
                                   {
                                     auto p = find_player(tgt);
-                                    if(p) p->send(s,use_color);
+                                    if(p) p->send(s);
                                     return p != nullptr;
                                   }
                                 );
 
-
     // Broadcast message to all player in a room
     system_module_.set_function ( "yell"
-                                , [&](room const& r, std::string const& s, bool use_color)
+                                , [&](room const& r, std::string const& s)
                                   {
                                     auto const& all_players = r.attendees();
                                     for(auto p : all_players)
-                                      p->send(s,use_color);
+                                      p->send(s);
                                   }
                                 );
 
     // Broadcast message to all connected players
     system_module_.set_function ( "broadcast"
-                                , [&](std::string const& s, bool use_color)
-                                  {
-                                    broadcast(s,use_color);
-                                  }
+                                , [&](std::string const& s) { broadcast(s); }
                                 );
 
     // Broadcast message to all connected players
@@ -259,7 +248,7 @@ namespace mudpp
                         , strings()["welcome"]
                         );
 
-    p->send(b,false);
+    p->send(b);
     p->login_prompt();
 
     return p.get();

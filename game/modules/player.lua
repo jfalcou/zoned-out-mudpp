@@ -26,7 +26,7 @@ local sm_login =
                   }
 
                   local c = utils.select_command(commands,input,true)
-                  current_player:send(c.prompt, true)
+                  current_player:send(c.prompt)
 
                   -- Going back to login requires a prompt
                   if(c.out == "login") then
@@ -65,7 +65,7 @@ local sm_login =
     , ["~"] =
     {
       trigger = function(from,current_player,input)
-                  current_player:send("##Sorry, your choice is invalid.\n\r", true)
+                  current_player:send("##Sorry, your choice is invalid.\n\r")
                   return from
                 end
     }

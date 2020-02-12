@@ -72,10 +72,9 @@ namespace mudpp
   void player::disconnect() { session_.disconnect(); }
   void player::shutdown()   { game_context_.shutdown();     }
 
-  void player::send( std::string const& msg, bool use_color )
+  void player::send( std::string const& msg )
   {
-    if(use_color) session_.send(colorize(msg));
-    else          session_.send(msg);
+    session_.send(colorize(msg));
     if(current_state_ == "play") session_.send(colorize("#b>##"));
   }
 

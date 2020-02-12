@@ -29,7 +29,7 @@ local sm_create_player =
 
                       if( utils.file_exists(savegame_path) ) then
                         current_player:send (   "The name @y" .. input .. "## is already in use.\n\r"
-                                            ..  "@y#bCharacter name:## ", true
+                                            ..  "@y#bCharacter name:## "
                                             )
 
                         return "new_player"
@@ -37,14 +37,14 @@ local sm_create_player =
                         current_player.name = input
                         current_player.data = {}
 
-                        current_player:send("Welcome @y#b" .. input .. "## !\n\r", true )
-                        current_player:send("@y#bChoose a password:## \n\r", true )
+                        current_player:send("Welcome @y#b" .. input .. "## !\n\r")
+                        current_player:send("@y#bChoose a password:## \n\r")
 
                         return "ask_password"
                       end
                     else
                       current_player:send (   "The name @y" .. input .. "## is invalid.\n\r"
-                                          ..  "@y#bCharacter name:## ", true
+                                          ..  "@y#bCharacter name:## "
                                           )
 
                       return "new_player"
@@ -60,12 +60,12 @@ local sm_create_player =
                     return "ask_password"
                   else
                     current_player.password = input
-                    current_player:send("Your password is: " .. input .. "\n\r", true)
+                    current_player:send("Your password is: " .. input .. "\n\r")
 
                     -- Save character before starting the game
                     current_player:save(utils.dump_table(current_player.data,"data"))
 
-                    current_player:send( messages["new_player"], true );
+                    current_player:send( messages["new_player"]);
                     current_player:enter(0)
 
                     return "play"
@@ -76,7 +76,7 @@ local sm_create_player =
     ["~"] =
     {
       trigger = function(from,current_player,input)
-                  current_player:send("##Sorry, your choice is invalid.\n\r", true)
+                  current_player:send("##Sorry, your choice is invalid.\n\r")
                   return from
                 end
     }

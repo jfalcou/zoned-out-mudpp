@@ -37,7 +37,7 @@ end
 function command.look(current_player, args)
   if( utils.empty(args) ) then
     -- no arguments, look at the room
-    current_player:send( current_player:location().description, true )
+    current_player:send( current_player:location().description )
   else
     -- are we looking in a direction ?
     local target = string.upper(args[1])
@@ -47,7 +47,7 @@ function command.look(current_player, args)
       local next_room = current_player:location():go(dir)
       if(next_room ~= -1) then
         local new_room = game.find_room(next_room)
-        current_player:send("In this direction, you see " .. new_room.name .. "\n\r", true)
+        current_player:send("In this direction, you see " .. new_room.name .. "\n\r")
       else
         current_player:send("There is nothing to look at there\n\r")
       end
@@ -63,7 +63,7 @@ end
 -- Quit command
 ----------------------------------------------------------------------------------------------------
 function command.quit(current_player, args)
-  game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n\r", true )
+  game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n\r")
 
   local dump = utils.dump_table(current_player.data,"data")
 
@@ -80,7 +80,7 @@ function command.yell(current_player, args)
   local msg = "@y#b".. current_player.name .. "## yells ''"
   for _,value in pairs(args) do msg = msg .. " " .. value end
 
-  game.yell ( current_player:location(), msg .. " ##''\n\r", true )
+  game.yell(current_player:location(), msg .. " ##''\n\r")
 
   return "play"
 end
@@ -95,10 +95,10 @@ function command.say(current_player, args)
   local msg = "@y#b".. current_player.name .. "## says ''"
   for _,value in pairs(args) do msg = msg .. " " .. value end
 
-  local ok = game.say(other_player, msg .."## ''\n\r", true)
+  local ok = game.say(other_player, msg .."## ''\n\r")
 
   if(not ok) then
-    current_player:send(other_player .. " is not nearby.\n\r", true)
+    current_player:send(other_player .. " is not nearby.\n\r")
   end
 
   return "play"
@@ -108,7 +108,7 @@ end
 -- Shutdown command
 ----------------------------------------------------------------------------------------------------
 function command.shutdown(current_player, args)
-  game.broadcast( "@r#bThe server will now shutdown ...##\n\r", true )
+  game.broadcast( "@r#bThe server will now shutdown ...##\n\r")
   current_player:shutdown()
   return "disconnected"
 end
@@ -117,7 +117,7 @@ end
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
 function command.unknown(current_player, args)
-  current_player:send("What do you mean ?\n\r", false)
+  current_player:send("What do you mean ?\n\r")
   return "play"
 end
 

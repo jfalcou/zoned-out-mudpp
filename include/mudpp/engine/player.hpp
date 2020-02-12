@@ -32,7 +32,7 @@ namespace mudpp
     void login_prompt();
     void save(std::string const& data);
     void process_input(std::string const& input);
-    void send( std::string const& msg, bool use_color = true );
+    void send(std::string const& msg);
 
     void go(int direction);
 
