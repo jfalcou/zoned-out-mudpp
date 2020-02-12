@@ -141,11 +141,11 @@ end
 ----------------------------------------------------------------------------------------------------
 -- Select a command from a command table
 ----------------------------------------------------------------------------------------------------
-function utils.select_command(commands,choice)
+function utils.select_command(commands,choice,case)
   local current = choice
 
   if(type(current) == "string") then
-    current = string.upper(current)
+    if(case) then current = string.upper(current) end
   end
 
   if( not utils.contain_key(commands,current) ) then

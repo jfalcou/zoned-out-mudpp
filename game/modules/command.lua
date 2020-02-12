@@ -19,7 +19,7 @@ command.direction_map = { ["N"] = 0, ["NORTH"] = 0
 ----------------------------------------------------------------------------------------------------
 -- go command
 ----------------------------------------------------------------------------------------------------
-function command.go(current_player, args, states)
+function command.go(current_player, args)
   local direction = string.upper(args[1])
 
   if(utils.contain_key(command.direction_map,direction)) then
@@ -28,13 +28,13 @@ function command.go(current_player, args, states)
     current_player:send("Where are you going ?\n\r")
   end
 
-  return states["play"]
+  return "play"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- look command
 ----------------------------------------------------------------------------------------------------
-function command.look(current_player, args, states)
+function command.look(current_player, args)
   if( utils.empty(args) ) then
     -- no arguments, look at the room
     current_player:send( current_player:location().description, true )
@@ -56,13 +56,13 @@ function command.look(current_player, args, states)
       current_player:send("There is nothing to look at there\n\r")
     end
   end
-  return states["play"]
+  return "play"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Quit command
 ----------------------------------------------------------------------------------------------------
-function command.quit(current_player, args, states)
+function command.quit(current_player, args)
   game.broadcast("@y#b".. current_player.name .."## is leaving the game.\n\r", true )
 
   local dump = utils.dump_table(current_player.data,"data")
@@ -70,25 +70,25 @@ function command.quit(current_player, args, states)
   current_player:save(dump)
   current_player:disconnect()
 
-  return states["disconnected"]
+  return "disconnected"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Yell command
 ----------------------------------------------------------------------------------------------------
-function command.yell(current_player, args, states)
+function command.yell(current_player, args)
   local msg = "@y#b".. current_player.name .. "## yells ''"
   for _,value in pairs(args) do msg = msg .. " " .. value end
 
   game.yell ( current_player:location(), msg .. " ##''\n\r", true )
 
-  return states["play"]
+  return "play"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Say command
 ----------------------------------------------------------------------------------------------------
-function command.say(current_player, args, states)
+function command.say(current_player, args)
   local other_player = args[1]
   table.remove(args,1)
 
@@ -101,24 +101,24 @@ function command.say(current_player, args, states)
     current_player:send(other_player .. " is not nearby.\n\r", true)
   end
 
-  return states["play"]
+  return "play"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Shutdown command
 ----------------------------------------------------------------------------------------------------
-function command.shutdown(current_player, args, states)
+function command.shutdown(current_player, args)
   game.broadcast( "@r#bThe server will now shutdown ...##\n\r", true )
   current_player:shutdown()
-  return states["disconnected"]
+  return "disconnected"
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Unknown command
 ----------------------------------------------------------------------------------------------------
-function command.unknown(current_player, args, states)
+function command.unknown(current_player, args)
   current_player:send("What do you mean ?\n\r", false)
-  return states["play"]
+  return "play"
 end
 
 
@@ -137,12 +137,12 @@ command.supported_commands =
   -- Directions
   --------------------------------------------------------------------------------------------------
   ["GO"]        = { op = command.go       , flags = "" },
-  ["N"]         = { op = function(p,a,s) return command.go(p,{"N"},s) end , flags = "" },
-  ["S"]         = { op = function(p,a,s) return command.go(p,{"S"},s) end , flags = "" },
-  ["E"]         = { op = function(p,a,s) return command.go(p,{"E"},s) end , flags = "" },
-  ["W"]         = { op = function(p,a,s) return command.go(p,{"W"},s) end , flags = "" },
-  ["U"]         = { op = function(p,a,s) return command.go(p,{"U"},s) end , flags = "" },
-  ["D"]         = { op = function(p,a,s) return command.go(p,{"D"},s) end , flags = "" },
+  ["N"]         = { op = function(p,a) return command.go(p,{"N"},s) end , flags = "" },
+  ["S"]         = { op = function(p,a) return command.go(p,{"S"},s) end , flags = "" },
+  ["E"]         = { op = function(p,a) return command.go(p,{"E"},s) end , flags = "" },
+  ["W"]         = { op = function(p,a) return command.go(p,{"W"},s) end , flags = "" },
+  ["U"]         = { op = function(p,a) return command.go(p,{"U"},s) end , flags = "" },
+  ["D"]         = { op = function(p,a) return command.go(p,{"D"},s) end , flags = "" },
   --------------------------------------------------------------------------------------------------
   -- Actions
   --------------------------------------------------------------------------------------------------
@@ -159,11 +159,11 @@ command.supported_commands =
 ----------------------------------------------------------------------------------------------------
 -- Select and execute command command
 ----------------------------------------------------------------------------------------------------
-function command.perform(current_player, cmd, args, states)
-  local com = utils.select_command(command.supported_commands,cmd)
+function command.perform(current_player, cmd, args)
+  local com = utils.select_command(command.supported_commands,cmd,true)
 
   -- TODO : check flags with curren_player:has_flags(com.flags )
-  return com.op (current_player, args, states)
+  return com.op (current_player, args)
 end
 
 ----------------------------------------------------------------------------------------------------
