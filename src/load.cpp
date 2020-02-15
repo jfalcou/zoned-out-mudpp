@@ -77,7 +77,7 @@ namespace mudpp
       else
       {
         current_player_->send( ctx.strings()["returning_player"]);
-        current_player_->enter( 0 );
+        current_player_->enqueue( "%transport 0" );
         return new play_state(current_player_);
       }
     }

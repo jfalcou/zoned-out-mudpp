@@ -32,7 +32,12 @@ namespace mudpp
   {
     auto data = input;
     boost::trim_if(data, boost::is_any_of(" "));
-    current_player_->enqueue( data );
+
+    if( !boost::starts_with(data, "%") )
+      current_player_->enqueue( data );
+    else
+      current_player_->prompt();
+
     return this;
   }
 
@@ -68,9 +73,13 @@ namespace mudpp
     //----------------------------------------------------------------------------------------------
     // Register meta-command
     //----------------------------------------------------------------------------------------------
-    {"/shutdown", ::mudpp::detail::shutdown }
-  , {"/quit"    , ::mudpp::detail::quit     }
-  , {"/who"     , ::mudpp::detail::who      }
+    {"/shutdown"  , ::mudpp::detail::shutdown   }
+  , {"/quit"      , ::mudpp::detail::quit       }
+  , {"/who"       , ::mudpp::detail::who        }
+    //----------------------------------------------------------------------------------------------
+    // Register internal commands
+    //----------------------------------------------------------------------------------------------
+  , {"%transport" , ::mudpp::detail::transport  }
     //----------------------------------------------------------------------------------------------
     // Register action
     //----------------------------------------------------------------------------------------------

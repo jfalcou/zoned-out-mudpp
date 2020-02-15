@@ -86,7 +86,7 @@ namespace mudpp
           current_player_->context().call<void>("save_player", current_player_);
 
           current_player_->send( ctx.strings()["new_player"]);
-          current_player_->enter( 0 );
+          current_player_->enqueue( "%transport 0" );
           return new play_state(current_player_);
         }
       }

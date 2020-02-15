@@ -19,6 +19,7 @@ namespace mudpp
 
   namespace detail
   {
+    void transport(player*, std::vector<std::string> const&);
     void who      (player*, std::vector<std::string> const&);
     void emote    (player*, std::vector<std::string> const&);
     void go       (player*, std::vector<std::string> const&);

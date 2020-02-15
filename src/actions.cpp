@@ -131,6 +131,15 @@ namespace mudpp::detail
   }
 
   //------------------------------------------------------------------------------------------------
+  // transport meta-command - Internal use only
+  // %transport <room id>: put players into said room
+  //------------------------------------------------------------------------------------------------
+  void transport(player* p, std::vector<std::string> const& args)
+  {
+    p->enter(std::stoi(args[0]));
+  }
+
+  //------------------------------------------------------------------------------------------------
   // Go command
   // go <direction>: go in a given direction
   //------------------------------------------------------------------------------------------------
@@ -184,7 +193,16 @@ namespace mudpp::detail
   //------------------------------------------------------------------------------------------------
   void shutdown(player* p, std::vector<std::string> const&)
   {
-    p->context().broadcast( "@r#bThe server will now shutdown ...##\n\r");
+    auto& ctx = p->context();
+    auto const& players = ctx.players();
+
+    ctx.broadcast( "@r#b[INFO]## #bSaving all logged characters...##\n\r");
+    for(auto const& other : players)
+    {
+      if(other->is_logged()) other->context().call<void>("save_player", other.get());
+    }
+
+    ctx.broadcast( "@r#b[INFO]## #bThe server will now shutdown ...##\n\r");
     p->shutdown();
   };
 
