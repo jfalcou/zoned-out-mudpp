@@ -70,11 +70,13 @@ namespace mudpp
     //----------------------------------------------------------------------------------------------
     {"/shutdown", ::mudpp::detail::shutdown }
   , {"/quit"    , ::mudpp::detail::quit     }
+  , {"/who"     , ::mudpp::detail::who      }
     //----------------------------------------------------------------------------------------------
     // Register action
     //----------------------------------------------------------------------------------------------
-  , {"yell"     , ::mudpp::detail::yell   }
+  , {"/me"      , ::mudpp::detail::emote  }
   , {"say"      , ::mudpp::detail::say    }
+  , {"tell"     , ::mudpp::detail::tell   }
   , {"look"     , ::mudpp::detail::look   }
   , {"go"       , ::mudpp::detail::go     }
     // All directions and directions shortcut

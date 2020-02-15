@@ -39,6 +39,7 @@ namespace mudpp
 
     room*   find_room(int id);
 
+    auto const& players() const { return players_; }
     player* find_player(std::string const& name);
     player* attach_player(session&);
 

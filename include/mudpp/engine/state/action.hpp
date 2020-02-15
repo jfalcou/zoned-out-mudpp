@@ -19,12 +19,14 @@ namespace mudpp
 
   namespace detail
   {
+    void who      (player*, std::vector<std::string> const&);
+    void emote    (player*, std::vector<std::string> const&);
     void go       (player*, std::vector<std::string> const&);
     void look     (player*, std::vector<std::string> const&);
     void quit     (player*, std::vector<std::string> const&);
     void say      (player*, std::vector<std::string> const&);
     void shutdown (player*, std::vector<std::string> const&);
-    void yell     (player*, std::vector<std::string> const&);
+    void tell     (player*, std::vector<std::string> const&);
   }
 }
 

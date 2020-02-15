@@ -57,46 +57,77 @@ namespace mudpp::detail
   }
 
   //------------------------------------------------------------------------------------------------
-  // Say command
-  // say <player> <text>: Say <text> to <player> if he's in the room
+  // Tell command
+  // tell <player> <text>: Tell <text> to <player> if he's in the room
   //------------------------------------------------------------------------------------------------
-  void say(player* p, std::vector<std::string> const& args)
+  void tell(player* p, std::vector<std::string> const& args)
   {
     if(args.size() <= 1)
     {
-      p->send("Say what to whom ?\n\r");
+      p->send("Tell what to whom ?\n\r");
       return;
     }
 
     if(auto target = p->context().find_player(args[0]))
     {
-      std::string msg = "#b@y" + p->name() + "## says: '";
+      std::string msg = "#b@y" + p->name() + "##: '";
       msg += aggregate(args.begin()+1,args.end());
       msg += "##'\n\r";
       target->send(msg);
       return;
     }
 
-    p->send("Say what to whom ?\n\r");
+    p->send("Tell what to whom ?\n\r");
   }
 
   //------------------------------------------------------------------------------------------------
-  // Yell command
-  // yell <text>: yell <text> to the room
+  // Say command
+  // say <text>: say <text> to the room
   //------------------------------------------------------------------------------------------------
-  void yell(player* p, std::vector<std::string> const& args)
+  void say(player* p, std::vector<std::string> const& args)
   {
     auto const& current_room = p->location();
 
-    std::string msg = "#b@y" + p->name() + "## yells '";
+    std::string msg = "#b@y" + p->name() + "## says '";
     msg += aggregate(args.begin(),args.end());
     msg += "'\n\r";
 
-    p->send("You yells to the room ...\n\r");
     for(auto other : current_room.attendees( ))
     {
-      if(other != p) other->send(msg);
+      other->send(msg);
     }
+  }
+  //------------------------------------------------------------------------------------------------
+  // Who command
+  // /who: List all the connected players and their locations
+  //------------------------------------------------------------------------------------------------
+  void who(player* p, std::vector<std::string> const& args)
+  {
+    auto const& players = p->context().players();
+
+    p->send("#b" + std::to_string(players.size()) + " player(s) connected:##\n\r");
+    for(auto const& other : players)
+    {
+      if(other->is_logged())
+      {
+        p->send( "#b * @y" + other->name() + "## is in " + other->location().name() + ".\n\r");
+      }
+    }
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Emote command
+  // /me <text>: Display a random action in character
+  //------------------------------------------------------------------------------------------------
+  void emote(player* p, std::vector<std::string> const& args)
+  {
+    auto const& current_room = p->location();
+
+    std::string msg = "#b#i" + p->name() + " ";
+    msg += aggregate(args.begin(),args.end());
+    msg += "##\n\r";
+
+    for(auto other : current_room.attendees( )) other->send(msg);
   }
 
   //------------------------------------------------------------------------------------------------
