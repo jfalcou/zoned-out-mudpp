@@ -7,8 +7,14 @@
 ##==================================================================================================
 
 add_library ( mudpp SHARED
+              actions.cpp
+              command.cpp
+              create.cpp
               game.cpp
               io.cpp
+              load.cpp
+              login.cpp
+              play.cpp
               player.cpp
               room.cpp
               session.cpp

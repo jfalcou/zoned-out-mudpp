@@ -32,7 +32,7 @@ namespace mudpp
 
     void  on_enter(player*);
     void  on_exit(player*);
-    int   go(int direction) const;
+    int   adjacent(int direction) const;
 
     int                       id()          const noexcept { return id_; }
     std::string const&        name()        const noexcept { return name_; }

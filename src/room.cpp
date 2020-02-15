@@ -60,7 +60,7 @@ namespace mudpp
       a->send( "#b@y" + attendee->name() + "## leaves.\n");
   }
 
-  int room::go(int direction) const
+  int room::adjacent(int direction) const
   {
     return exits_[direction];
   }
@@ -69,8 +69,7 @@ namespace mudpp
   {
     // make usertype metatable
     ut = lua.new_usertype<room>("room");
-    ut["tick"]        = &room::tick;
-    ut["go"]          = &room::go;
+    ut["adjacent"]    = &room::adjacent;
     ut["id"]          = sol::property(&room::id          , &room::set_id);
     ut["name"]        = sol::property(&room::name        , &room::set_name);
     ut["description"] = sol::property(&room::description , &room::set_description);

@@ -12,9 +12,12 @@
 
 #include <mudpp/system/property_map.hpp>
 #include <mudpp/system/session.hpp>
+#include <mudpp/engine/game_state.hpp>
+#include <mudpp/engine/command.hpp>
 #include <sol/sol.hpp>
 #include <string>
 #include <memory>
+#include <queue>
 
 namespace mudpp
 {
@@ -29,15 +32,18 @@ namespace mudpp
     void tick();
     void shutdown();
     void disconnect();
-    void login_prompt();
+    void login();
     void save(std::string const& data);
     void process_input(std::string const& input);
     void send(std::string const& msg);
 
     void go(int direction);
+    void prompt();
 
     void enter(int id);
     void exit();
+
+    void enqueue(std::string const& input);
 
     std::size_t length() const                                { return properties_.length();  }
     void set(std::string const& key, sol::stack_object value) { properties_.set(key,value);   }
@@ -58,21 +64,23 @@ namespace mudpp
       return current_state_ != "disconnected"sv;
     }
 
-    bool is_logged() const
-    {
-      using namespace std::literals;
-      return current_state_ == "play"sv;
-    }
+    void set_logged()       { logged_ = true; }
+    bool is_logged() const  { return logged_; }
+
+    game&  context() { return game_context_; }
 
     static void setup_scripting( sol::usertype<player>& player_type, sol::state& );
 
     private:
-    property_map  properties_;
-    session&      session_;
-    game&         game_context_;
-    std::string   current_state_;
-    std::string   name_, password_;
-    room*         current_room_;
+    property_map                properties_;
+    session&                    session_;
+    game&                       game_context_;
+    std::string                 current_state_;
+    std::string                 name_, password_;
+    room*                       current_room_;
+    std::unique_ptr<game_state> current_game_state_;
+    std::queue<command_t>       commands_;
+    bool                        logged_;
   };
 
   using player_t = std::unique_ptr<player>;

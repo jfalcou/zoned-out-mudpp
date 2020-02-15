@@ -1,44 +1,28 @@
 ----------------------------------------------------------------------------------------------------
--- Helpers functions module
+-- List of functions for managing players from outside
 ----------------------------------------------------------------------------------------------------
-local utils = {}
 
 ----------------------------------------------------------------------------------------------------
--- Check a table is empty
+-- Load a player from a .player file
 ----------------------------------------------------------------------------------------------------
-function utils.empty(t)
-  local next = next
-  return (next(t) == nil)
+function load_player(current_player, path)
+  dofile(path)
+  current_player.data     = player["data"]
+  current_player.password = player["password"]
 end
 
 ----------------------------------------------------------------------------------------------------
--- Check a file exists
+-- Prepare a player dynamic data
 ----------------------------------------------------------------------------------------------------
-function utils.file_exists(name)
-   local f=io.open(name,"r")
-   if f~=nil then io.close(f) return true else return false end
-end
-
-----------------------------------------------------------------------------------------------------
--- Checks a string is empty
-----------------------------------------------------------------------------------------------------
-function utils.split(inputstr, sep)
-  sep = sep or "%s"
-
-  local t={}
-
-  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-    table.insert(t, str)
-  end
-
-  return t
+function setup_player(current_player)
+  current_player.data = {}
 end
 
 ----------------------------------------------------------------------------------------------------
 -- Dump a table to a string
 -- Thanks to https://stackoverflow.com/questions/9168058
 ----------------------------------------------------------------------------------------------------
-function utils.dump_table(node,name)
+local function dump_table(node,name)
   local cache, stack, output = {},{},{}
   local depth = 1
   local output_str = name .. " = {\n\r"
@@ -120,56 +104,13 @@ function utils.dump_table(node,name)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Checks a string is empty
+-- Save a player to a .player file
 ----------------------------------------------------------------------------------------------------
-function utils.is_empty(s)
-  return s == nil or s == ''
+function save_player(current_player)
+  local dump = dump_table(current_player.data,"data")
+  current_player:save(dump)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Checks if a table has data associated to a given key
+game.log('Module player - loaded')
 ----------------------------------------------------------------------------------------------------
-function utils.contain_key(values, key)
-  for k, _ in pairs(values) do
-    if k == key then
-      return true
-    end
-  end
-  return false
-end
-
-----------------------------------------------------------------------------------------------------
--- Checks if a table contains a given value
-----------------------------------------------------------------------------------------------------
-function utils.contain_value(values, target)
-  for _, v in pairs(values) do
-    if v == target then
-      return true
-    end
-  end
-  return false
-end
-
-----------------------------------------------------------------------------------------------------
--- Select a command from a command table
-----------------------------------------------------------------------------------------------------
-function utils.select_command(commands,choice,case)
-  local current = choice
-
-  if(type(current) == "string") then
-    if(case) then current = string.upper(current) end
-  end
-
-  if( not utils.contain_key(commands,current) ) then
-    current = "~"
-  end
-
-  return commands[current]
-end
-
-----------------------------------------------------------------------------------------------------
-game.log('Module utils - loaded')
-----------------------------------------------------------------------------------------------------
-
-return utils
-

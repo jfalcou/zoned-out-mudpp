@@ -18,6 +18,7 @@
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
 #include <string_view>
+#include <functional>
 #include <vector>
 #include <map>
 
@@ -41,26 +42,32 @@ namespace mudpp
     player* find_player(std::string const& name);
     player* attach_player(session&);
 
-    std::map<std::string,std::string>&  strings()       { return messages_.value();   }
-    sol::state&                         script_engine() { return lua_state_;  }
-    boost::asio::io_service&            io()            { return ios_;        }
-    std::map<std::string,std::string>&  paths()         { return paths_.value(); }
+    std::map<std::string,std::string>&      strings()       { return messages_.value(); }
+    sol::state&                             script_engine() { return lua_state_;        }
+    boost::asio::io_service&                io()            { return ios_;              }
+    std::map<std::string,std::string>&      paths()         { return paths_.value();    }
 
     template<typename Ret, typename Name, typename... Args>
     auto inline call(Name const& f, Args&&... args)
     {
       sol::function func = lua_state_[f];
-      Ret that = func(std::forward<Args>(args)...);
-      return that;
+      if constexpr( !std::is_same_v<Ret,void> )
+      {
+        Ret that = func(std::forward<Args>(args)...);
+        return that;
+      }
+      else
+      {
+        func(std::forward<Args>(args)...);
+      }
     }
 
-    bool exists( player const& p);
+    bool exists( std::string const& name);
 
     template<typename Function> void register_event(int period, Function f)
     {
       events_.push_back( periodic_event::make(ios_, period, f) );
     }
-
 
     private:
     void load_zones();

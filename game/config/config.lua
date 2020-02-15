@@ -1,8 +1,6 @@
 ----------------------------------------------------------------------------------------------------
 -- Basic option for MUDpp
 ----------------------------------------------------------------------------------------------------
-local module_folder = "./modules/"
-package.path = module_folder .. "?.lua;" .. package.path
 
 ----------------------------------------------------------------------------------------------------
 -- Path to MUD files
@@ -10,7 +8,7 @@ package.path = module_folder .. "?.lua;" .. package.path
 path  = { asset   = "asset/"
         , saves   = "saves/"
         , strings = "config/strings.lua"
-        , player  = "modules/player.lua"
+        , player  = "config/player.lua"
         }
 
 ----------------------------------------------------------------------------------------------------

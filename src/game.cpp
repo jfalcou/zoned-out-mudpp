@@ -37,10 +37,10 @@ namespace mudpp
     shutdown_ = true;
   }
 
-  bool game::exists( player const& p)
+  bool game::exists( std::string const& name )
   {
     return std::find_if ( players_.begin(), players_.end()
-                        , [&](auto const& e) { return e->name() == p.name() && e->is_logged(); }
+                        , [&](auto const& e) { return e->name() == name && e->is_logged(); }
                         ) != players_.end();
   }
 
@@ -82,7 +82,7 @@ namespace mudpp
     log(std::cout,"GAME") << "Start..." << std::endl;
 
     // Setup game events
-    register_event( lua_state_["tick_period"], [this]() { for(auto& p : players_) p->tick(); } );
+    register_event( period_, [this]() { for(auto& p : players_) p->tick(); } );
 
     // Cleanup resources
     register_event( lua_state_["cleanup_period"], [this]() { cleanup(); } );
@@ -161,6 +161,7 @@ namespace mudpp
 
   void game::setup_scripting( std::string const& config_file )
   {
+    // Prepare LUA
     lua_state_.open_libraries ( sol::lib::base, sol::lib::io, sol::lib::string
                               , sol::lib::math, sol::lib::os, sol::lib::package
                               , sol::lib::table
@@ -174,47 +175,7 @@ namespace mudpp
                                 );
 
     // Provide access to game::exists from LUA
-    system_module_.set_function ( "player_exists", [&](player const& p) { return exists( p ); } );
-
-    // Provide access to a "build a colored text" for lUA
-    system_module_.set_function ( "colorize", [&](std::string const& s) { return colorize(s); } );
-
-    // Broadcast message to a player in a room
-    system_module_.set_function ( "say"
-                                , [&](std::string const& tgt, std::string const& s)
-                                  {
-                                    auto p = find_player(tgt);
-                                    if(p) p->send(s);
-                                    return p != nullptr;
-                                  }
-                                );
-
-    // Broadcast message to all player in a room
-    system_module_.set_function ( "yell"
-                                , [&](room const& r, std::string const& s)
-                                  {
-                                    auto const& all_players = r.attendees();
-                                    for(auto p : all_players)
-                                      p->send(s);
-                                  }
-                                );
-
-    // Broadcast message to all connected players
-    system_module_.set_function ( "broadcast"
-                                , [&](std::string const& s) { broadcast(s); }
-                                );
-
-    // Broadcast message to all connected players
-    system_module_.set_function ( "find_room"
-                                , [&](int id)
-                                  {
-                                    auto r = find_room(id);
-                                    if(!r) log(std::cout,"GAME")  << "Room " << id
-                                                                  << " does not exists"
-                                                                  << std::endl;
-                                    return *r;
-                                  }
-                                );
+    system_module_.set_function ( "player_exists", [&](std::string const& p) { return exists( p ); } );
 
     // Sanity check
     lua_state_.script ( "game.log('LUA engine started.')" );
@@ -238,18 +199,7 @@ namespace mudpp
     players_.push_back(player::make(s));
 
     auto& p = players_.back();
-    auto b = box_message( {"@", tabulate::Color::yellow}
-                        , {"¤", tabulate::Color::yellow}
-                        , { {tabulate::FontStyle::bold}
-                          , tabulate::Color::red
-                          , tabulate::FontAlign::center
-                          }
-                        , 100
-                        , strings()["welcome"]
-                        );
-
-    p->send(b);
-    p->login_prompt();
+    p->login();
 
     return p.get();
   }
