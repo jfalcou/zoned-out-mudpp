@@ -10,24 +10,29 @@
 #ifndef MUDPP_API_HPP_INCLUDED
 #define MUDPP_API_HPP_INCLUDED
 
-#if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
-  #ifdef MUDPP_API_EXPORTS
-    #ifdef __GNUC__
-      #define MUDPP_API __attribute__ ((dllexport))
-    #else
-      #define MUDPP_API __declspec(dllexport)
-    #endif
-  #else
-    #ifdef __GNUC__
-      #define MUDPP_API __attribute__ ((dllimport))
-    #else
-      #define MUDPP_API __declspec(dllimport)
-    #endif
-  #endif
+#if defined MUDPP_API_STATIC // In static mode, no symbol import/export.
+  #define MUDPP_API
   #define MUDPP_INTERNAL
 #else
-  #define MUDPP_API       __attribute__ ((visibility ("default")))
-  #define MUDPP_INTERNAL  __attribute__ ((visibility ("hidden")))
+  #if defined _WIN32 || defined __CYGWIN__ || defined __MINGW32__
+    #ifdef MUDPP_API_EXPORTS
+      #ifdef __GNUC__
+        #define MUDPP_API __attribute__ ((dllexport))
+      #else
+        #define MUDPP_API __declspec(dllexport)
+      #endif
+    #else
+      #ifdef __GNUC__
+        #define MUDPP_API __attribute__ ((dllimport))
+      #else
+        #define MUDPP_API __declspec(dllimport)
+      #endif
+    #endif
+    #define MUDPP_INTERNAL
+  #else
+    #define MUDPP_API       __attribute__ ((visibility ("default")))
+    #define MUDPP_INTERNAL  __attribute__ ((visibility ("hidden")))
+  #endif
 #endif
 
 #endif
