@@ -1,6 +1,9 @@
 ----------------------------------------------------------------------------------------------------
 -- List of functions for managing players from outside
 ----------------------------------------------------------------------------------------------------
+dofile("config/utils.lua")
+dofile("asset/races.lua")
+dofile("asset/archetypes.lua")
 
 ----------------------------------------------------------------------------------------------------
 -- Load a player from a .player file
@@ -19,96 +22,63 @@ function setup_player(current_player)
 end
 
 ----------------------------------------------------------------------------------------------------
--- Dump a table to a string
--- Thanks to https://stackoverflow.com/questions/9168058
-----------------------------------------------------------------------------------------------------
-local function dump_table(node,name)
-  local cache, stack, output = {},{},{}
-  local depth = 1
-  local output_str = name .. " = {\n\r"
-
-  while true do
-    local size = 0
-    for k,v in pairs(node) do
-      size = size + 1
-    end
-
-    local cur_index = 1
-    for k,v in pairs(node) do
-      if (cache[node] == nil) or (cur_index >= cache[node]) then
-
-        if (string.find(output_str,"}",output_str:len())) then
-          output_str = output_str .. ",\n\r"
-        elseif not (string.find(output_str,"\n\r",output_str:len())) then
-          output_str = output_str .. "\n\r"
-        end
-
-        -- This is necessary for working with HUGE tables otherwise
-        -- we run out of memory using concat on huge strings
-        table.insert(output,output_str)
-        output_str = ""
-
-        local key
-        if (type(k) == "number" or type(k) == "boolean") then
-          key = "["..tostring(k).."]"
-        else
-          key = "['"..tostring(k).."']"
-        end
-
-        if (type(v) == "number" or type(v) == "boolean") then
-          output_str = output_str .. string.rep(' ',12*depth) .. key .. " = "..tostring(v)
-        elseif (type(v) == "table") then
-          output_str = output_str .. string.rep(' ',12*depth) .. key .. " = {\n\r"
-          table.insert(stack,node)
-          table.insert(stack,v)
-          cache[node] = cur_index+1
-          break
-        else
-          output_str = output_str .. string.rep(' ',12*depth) .. key .. " = '"..tostring(v).."'"
-        end
-
-        if (cur_index == size) then
-          output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
-        else
-          output_str = output_str .. ","
-        end
-      else
-        -- close the table
-        if (cur_index == size) then
-          output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
-        end
-      end
-
-      cur_index = cur_index + 1
-    end
-
-    if (size == 0) then
-      output_str = output_str .. "\n\r" .. string.rep(' ',12*(depth-1)) .. "}"
-    end
-
-    if (#stack > 0) then
-      node = stack[#stack]
-      stack[#stack] = nil
-      depth = cache[node] == nil and depth + 1 or depth - 1
-    else
-      break
-    end
-  end
-
-  -- This is necessary for working with HUGE tables otherwise
-  -- we run out of memory using concat on huge strings
-  table.insert(output,output_str)
-  output_str = table.concat(output)
-
-  return output_str
-end
-
-----------------------------------------------------------------------------------------------------
 -- Save a player to a .player file
 ----------------------------------------------------------------------------------------------------
 function save_player(current_player)
   local dump = dump_table(current_player.data,"data")
   current_player:save(dump)
+end
+
+----------------------------------------------------------------------------------------------------
+-- Process name input
+----------------------------------------------------------------------------------------------------
+local function handle_name(current_player,input)
+  if( game.is_valid_name(input) ) then
+    if(game.file_exists(input)) then
+      current_player:send ( "The name @y" .. input .. "## is already in use.\n\r")
+      return false
+    else
+      current_player.name = input
+      setup_player(current_player)
+      current_player:send( "Welcome @y#b" .. input .. "## !\n\r");
+      return true
+    end
+  else
+    current_player:send( "The name @y" .. input .. "## is invalid.\n\r");
+    return false
+  end
+end
+----------------------------------------------------------------------------------------------------
+-- Handle player's character generation
+----------------------------------------------------------------------------------------------------
+local pc_menus =  { [0] = function(p) p:send("#b@yCharacter name:## ") end
+                  , [1] = function(p) p:send("#b@yPassword:## ") end
+                  , [2] = display_races
+                  , [3] = display_archetypes
+                  }
+
+local pc_handlers = { [0] = handle_name
+                    , [1] = function(p,i) p.password  = i return true end
+                    , [2] = handle_races
+                    , [3] = handle_archetypes
+                    }
+
+function creation_max_step()
+  return length(pc_menus)
+end
+
+function creation_menu(current_player, step)
+  local fn = pc_menus[step]
+  fn(current_player)
+end
+
+function creation_handler(current_player, step, input)
+  local fn = pc_handlers[step]
+  if( fn(current_player, input) ) then
+    return step+1
+  else
+    return step
+  end
 end
 
 ----------------------------------------------------------------------------------------------------

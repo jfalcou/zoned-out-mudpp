@@ -1,9 +1,9 @@
 ----------------------------------------------------------------------------------------------------
--- MUDpp Race - Human
+-- MUDpp Race - Elf
 ----------------------------------------------------------------------------------------------------
 
-human = { name  = "Human"
-        , desc  = "Human characters can master any skills but have average stats."
-        }
+elf = { name  = "Elf"
+      , desc  = "Elf characters are attuned to nature and make perfect mages or ranger. There dexterity is legendary."
+      }
 
-races["human"] = human
+races["elf"] = elf

@@ -11,16 +11,14 @@
 #include <mudpp/engine/state/play.hpp>
 #include <mudpp/engine/player.hpp>
 #include <mudpp/engine/game.hpp>
-#include <boost/algorithm/string.hpp>
-#include <filesystem>
 #include <iostream>
 #include <memory>
 
 namespace mudpp
 {
-  create_state::create_state(player* p) : current_player_(p), current_step_(step::name_)
+  create_state::create_state(player* p) : current_player_(p), current_step_(0)
   {
-    current_player_->send("#b@yCharacter name:## ");
+    current_player_->context().call<void>( "creation_menu", current_player_, current_step_);
   }
 
   std::unique_ptr<create_state> create_state::make(player* p)
@@ -30,69 +28,33 @@ namespace mudpp
 
   game_state* create_state::process_input(std::string const& input)
   {
-    auto& ctx = current_player_->context();
+    int max_step  = current_player_->context().call<int>("creation_max_step");
+    auto& ctx     = current_player_->context();
 
-    switch(current_step_)
+    if(input.empty())
     {
-      case step::name_:
-      {
-        if( std::all_of ( input.begin(), input.end()
-                        , [](char c) {  return   (c >= '0' && c <= '9')
-                                              || (c >= 'a' && c <= 'z') ||  (c >= 'A' && c <= 'Z')
-                                              || (c == '_');
-                                      }
-                        )
-          )
-        {
-          auto savegame_path = ctx.paths()["saves"] + input + ".player";
+      ctx.call<void>("creation_menu", current_player_, current_step_);
+    }
+    else
+    {
+      current_step_ = ctx.call<int>( "creation_handler", current_player_, current_step_, input);
 
-          if( std::filesystem::exists( savegame_path ) )
-          {
-            current_player_->send ( "The name @y" + input + "## is already in use.\n\r"
-                                  + "@y#bCharacter name:## "
-                                  );
-          }
-          else
-          {
-            current_player_->set_name(input);
-            ctx.call<void>("setup_player",current_player_);
-            current_player_->send( "Welcome @y#b" + input + "## !\n\r");
-            current_player_->send( "@y#bChoose a password:## ");
-            current_step_ = step::password_;
-          }
-        }
-        else
-        {
-          current_player_->send ( "The name @y" + input + "## is invalid.\n\r"
-                                + "@y#bCharacter name:## "
-                                );
-        }
+      if(current_step_ < max_step)
+        ctx.call<void>("creation_menu", current_player_, current_step_);
+    }
 
-        return this;
-      }
-      break;
+    if(current_step_ == max_step)
+    {
+      ctx.call<void>("save_player", current_player_);
+      current_player_->send( ctx.strings()["new_player"]);
+      current_player_->enqueue( "%transport 0" );
+      current_player_->set_logged();
 
-      case step::password_:
-      {
-        if(input.empty())
-        {
-          current_player_->send( "@y#bChoose a password:## ");
-          return this;
-        }
-        else
-        {
-          current_player_->set_password(input);
-          current_player_->send("Your password is: " + input + "\n\r");
-          current_player_->context().call<void>("save_player", current_player_);
-
-          current_player_->send( ctx.strings()["new_player"]);
-          current_player_->enqueue( "%transport 0" );
-          return new play_state(current_player_);
-        }
-      }
-      break;
-    };
-
-    return this;
+      return new play_state(current_player_);
+    }
+    else
+    {
+      return this;
+    }
   }
 }

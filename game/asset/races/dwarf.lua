@@ -1,9 +1,9 @@
 ----------------------------------------------------------------------------------------------------
--- MUDpp Race - Human
+-- MUDpp Race - Dwarf
 ----------------------------------------------------------------------------------------------------
 
-human = { name  = "Human"
-        , desc  = "Human characters can master any skills but have average stats."
+dwarf = { name  = "Dwarf"
+        , desc  = "Dwarf characters are skillful priests and warriors. They're exceptionally sturdy."
         }
 
-races["human"] = human
+races["dwarf"] = dwarf

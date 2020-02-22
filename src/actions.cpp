@@ -105,7 +105,11 @@ namespace mudpp::detail
   {
     auto const& players = p->context().players();
 
-    p->send("#b" + std::to_string(players.size()) + " player(s) connected:##\n\r");
+    auto nb_player = std::count_if(players.begin(),players.end()
+                                  , [](auto const& p) { return p->is_logged(); }
+                                  );
+
+    p->send("#b" + std::to_string(nb_player) + " player(s) connected:##\n\r");
     for(auto const& other : players)
     {
       if(other->is_logged())

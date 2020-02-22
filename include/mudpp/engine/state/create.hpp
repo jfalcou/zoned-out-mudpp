@@ -19,8 +19,6 @@ namespace mudpp
 
   struct create_state final : public game_state
   {
-    enum class step { name_, password_ };
-
     create_state(player* p);
 
     static std::unique_ptr<create_state> make(player* p);
@@ -28,8 +26,8 @@ namespace mudpp
     virtual game_state* process_input(std::string const& input);
 
     private:
-    player*   current_player_;
-    step      current_step_;
+    player* current_player_;
+    int     current_step_;
   };
 }
 

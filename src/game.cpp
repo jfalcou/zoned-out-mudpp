@@ -13,6 +13,7 @@
 #include <mudpp/system/session.hpp>
 #include <mudpp/system/io.hpp>
 #include <boost/asio.hpp>
+#include <filesystem>
 #include <iostream>
 
 namespace mudpp
@@ -175,7 +176,33 @@ namespace mudpp
                                 );
 
     // Provide access to game::exists from LUA
-    system_module_.set_function ( "player_exists", [&](std::string const& p) { return exists( p ); } );
+    system_module_.set_function ( "player_exists"
+                                , [&](std::string const& p) { return exists( p ); }
+                                );
+
+    // Validate character name
+    system_module_.set_function ( "is_valid_name"
+                                , [&](std::string const& s)
+                                  {
+                                    return std::all_of( s.begin(), s.end()
+                                                      , [](char c)
+                                                          {  return   (c >= '0' && c <= '9')
+                                                                  ||  (c >= 'a' && c <= 'z')
+                                                                  ||  (c >= 'A' && c <= 'Z')
+                                                                  ||  (c == '_');
+                                                          }
+                                                    );
+                                  }
+                                );
+
+    // Validate existence of palyer save file
+    system_module_.set_function ( "file_exists"
+                                , [&](std::string const& s)
+                                  {
+                                    auto savegame_path = paths()["saves"] + s + ".player";
+                                    return std::filesystem::exists( savegame_path );
+                                  }
+                                );
 
     // Sanity check
     lua_state_.script ( "game.log('LUA engine started.')" );

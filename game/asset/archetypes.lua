@@ -1,34 +1,35 @@
 ----------------------------------------------------------------------------------------------------
--- MUDpp Races
+-- MUDpp Archetypes
 ----------------------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------------------
--- List all races
+-- List all archetypes
 ----------------------------------------------------------------------------------------------------
-races = {}
-dofile("asset/races/human.lua")
-dofile("asset/races/elf.lua")
-dofile("asset/races/dwarf.lua")
+archetypes = {}
+dofile("asset/archetypes/fighter.lua")
+dofile("asset/archetypes/ranger.lua")
+dofile("asset/archetypes/cleric.lua")
+dofile("asset/archetypes/caster.lua")
 
 ----------------------------------------------------------------------------------------------------
--- Display all races
+-- Display all archetypes
 ----------------------------------------------------------------------------------------------------
-function display_races(current_player)
-  current_player:send("Choose your #bRace##:\n\r")
-  for _,r in pairs(races) do
+function display_archetypes(current_player)
+  current_player:send("Choose your #bArchetype##:\n\r")
+  for _,r in pairs(archetypes) do
     current_player:send("#b@y" .. r.name .. "##\t- " .. r.desc .. "\n\r")
   end
 end
 
 ----------------------------------------------------------------------------------------------------
--- Handle race selection
+-- Handle archetype selection
 ----------------------------------------------------------------------------------------------------
-function handle_races(current_player, input)
+function handle_archetypes(current_player, input)
   local choice = string.lower(input)
-  if( contain_key(races, choice) ) then
-    local chosen_race = races[choice]
-    current_player.data["race"] = chosen_race.name
-    current_player:send("Your #b@yRace## is #b@y" .. current_player.data["race"] .. "##\n\r")
+  if( contain_key(archetypes, choice) ) then
+    local chosen_archetype = archetypes[choice]
+    current_player.data["archetype"] = chosen_archetype.name
+    current_player:send("Your #b@yArchetype## is #b@y" .. current_player.data["archetype"] .. "##\n\r")
     return true
   else
     return false
