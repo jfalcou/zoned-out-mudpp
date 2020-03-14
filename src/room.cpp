@@ -19,17 +19,19 @@ namespace mudpp
   room::room(game& g, int id, sol::table const& data)
       : game_context_(g)
       , attendees_{}
-      , name_(data["name"].get<std::string>()), description_(std::string(data["desc"].get<std::string>())+"\n")
+      , name_(data["name"].get<std::string>())
+      , description_(std::string(data["desc"].get<std::string>())+"\n")
       , id_(id)
   {
     sol::table e = data["exit"];
 
-    exits_[0] = e.get_or("n",-1);
-    exits_[1] = e.get_or("s",-1);
-    exits_[2] = e.get_or("e",-1);
-    exits_[3] = e.get_or("w",-1);
-    exits_[4] = e.get_or("u",-1);
-    exits_[5] = e.get_or("d",-1);
+    constexpr const char* dirs[] = {"n","s","e", "w", "u", "d"};
+
+    for(std::size_t i=0;i<exits_.size();++i)
+    {
+      auto t = e.get<sol::optional<sol::table>>(dirs[i]);
+      if(t) exits_[i] = exit(t.value());
+    }
   }
 
   void room::tick()
@@ -38,7 +40,7 @@ namespace mudpp
     {
       // If room is empty of player and that's x mn, just reset it
 
-      // Update all active mod in room and adjacent room
+      // Update all active mod in room and traverse room
 
       // Other upkeep
     }
@@ -60,16 +62,16 @@ namespace mudpp
       a->send( "#b@y" + attendee->name() + "## leaves.\n");
   }
 
-  int room::adjacent(int direction) const
+  int room::traverse(int direction, player* p) const
   {
-    return exits_[direction];
+    return exits_[direction].traverse(p);
   }
 
   void room::setup_scripting( sol::usertype<room>& ut, sol::state& lua)
   {
     // make usertype metatable
     ut = lua.new_usertype<room>("room");
-    ut["adjacent"]    = &room::adjacent;
+    ut["traverse"]    = &room::traverse;
     ut["id"]          = sol::property(&room::id          , &room::set_id);
     ut["name"]        = sol::property(&room::name        , &room::set_name);
     ut["description"] = sol::property(&room::description , &room::set_description);

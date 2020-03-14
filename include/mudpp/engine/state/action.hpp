@@ -24,6 +24,7 @@ namespace mudpp
     void emote    (player*, std::vector<std::string> const&);
     void go       (player*, std::vector<std::string> const&);
     void look     (player*, std::vector<std::string> const&);
+    void open     (player*, std::vector<std::string> const&);
     void quit     (player*, std::vector<std::string> const&);
     void say      (player*, std::vector<std::string> const&);
     void shutdown (player*, std::vector<std::string> const&);

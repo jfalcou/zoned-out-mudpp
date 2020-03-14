@@ -10,6 +10,7 @@ add_library ( mudpp SHARED
               actions.cpp
               command.cpp
               create.cpp
+              exit.cpp
               game.cpp
               io.cpp
               load.cpp

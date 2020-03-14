@@ -74,15 +74,15 @@ namespace mudpp
     // Find room in given direction
     if(current_room_)
     {
-      int dest = current_room_->adjacent(direction);
-      if(dest != -1)
+      int dest = current_room_->traverse(direction,this);
+      if(dest >= 0)
       {
         this->exit();
         enter(dest);
       }
       else
       {
-        send("Where are you going ?\n");
+        if(dest==-2) send("Where are you going ?\n");
       }
     }
   }

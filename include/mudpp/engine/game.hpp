@@ -14,6 +14,7 @@
 #include <mudpp/engine/player.hpp>
 #include <mudpp/engine/room.hpp>
 #include <mudpp/engine/zone.hpp>
+#include <mudpp/engine/exit.hpp>
 #include <mudpp/deps/api.hpp>
 #include <boost/asio.hpp>
 #include <sol/sol.hpp>
@@ -79,6 +80,7 @@ namespace mudpp
     sol::usertype<player>                           player_type_;
     sol::usertype<room>                             room_type_;
     sol::usertype<zone>                             zone_type_;
+    sol::usertype<exit>                             exit_type_;
     sol::table                                      system_module_;
 
     // NETWORK

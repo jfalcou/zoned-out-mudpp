@@ -10,6 +10,7 @@
 #ifndef MUDPP_ENGINE_ROOM_HPP_INCLUDED
 #define MUDPP_ENGINE_ROOM_HPP_INCLUDED
 
+#include <mudpp/engine/exit.hpp>
 #include <sol/sol.hpp>
 #include <string>
 #include <set>
@@ -32,7 +33,7 @@ namespace mudpp
 
     void  on_enter(player*);
     void  on_exit(player*);
-    int   adjacent(int direction) const;
+    int   traverse(int direction, player*) const;
 
     int                       id()          const noexcept { return id_; }
     std::string const&        name()        const noexcept { return name_; }
@@ -46,7 +47,7 @@ namespace mudpp
     private:
     game&                 game_context_;
     std::set<player*>     attendees_;
-    std::array<int,6>     exits_;
+    std::array<exit,6>    exits_;
     std::string           name_;
     std::string           description_;
     int                   id_;

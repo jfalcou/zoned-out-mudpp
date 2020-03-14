@@ -84,10 +84,11 @@ namespace mudpp
     // Register action
     //----------------------------------------------------------------------------------------------
   , {"/me"      , ::mudpp::detail::emote  }
+  , {"go"       , ::mudpp::detail::go     }
+  , {"look"     , ::mudpp::detail::look   }
+  , {"open"     , ::mudpp::detail::open   }
   , {"say"      , ::mudpp::detail::say    }
   , {"tell"     , ::mudpp::detail::tell   }
-  , {"look"     , ::mudpp::detail::look   }
-  , {"go"       , ::mudpp::detail::go     }
     // All directions and directions shortcut
   , {"n"        , [](auto* p, auto const&) { ::mudpp::detail::go(p,{"n"s    }); } }
   , {"north"    , [](auto* p, auto const&) { ::mudpp::detail::go(p,{"north"s}); } }

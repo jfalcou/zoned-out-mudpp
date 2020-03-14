@@ -178,7 +178,7 @@ namespace mudpp::detail
     {
       if(auto direction = direction_from(args[0]); direction != -1)
       {
-        auto next_room = p->location().adjacent(direction);
+        auto next_room = p->location().traverse(direction,p);
         if(next_room != -1)
         {
           auto new_room = p->context().find_room(next_room);
@@ -189,6 +189,27 @@ namespace mudpp::detail
 
       // Nothing to look at
       p->send( "There is nothing to look at there.\n\r" );
+    }
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // Open command
+  // open: open an interacting object
+  // open <object>: perform he action 'open' on a given object
+  //------------------------------------------------------------------------------------------------
+  void open(player* p, std::vector<std::string> const& args)
+  {
+    if(args.empty())
+    {
+      // No arguments
+      p->send( "Open what ?\n\r" );
+    }
+    else
+    {
+      if(args[0] == "door")
+      {
+        // ???
+      }
     }
   }
 

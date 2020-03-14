@@ -9,6 +9,7 @@
 //==================================================================================================
 #include <mudpp/engine/game.hpp>
 #include <mudpp/engine/player.hpp>
+#include <mudpp/engine/exit.hpp>
 #include <mudpp/system/timestamp.hpp>
 #include <mudpp/system/session.hpp>
 #include <mudpp/system/io.hpp>
@@ -216,6 +217,7 @@ namespace mudpp
     player::setup_scripting (player_type_ , lua_state_);
     room::setup_scripting   (room_type_   , lua_state_);
     zone::setup_scripting   (zone_type_   , lua_state_);
+    exit::setup_scripting   (exit_type_   , lua_state_);
 
     lua_state_.script_file( paths()["player"].c_str() );
   }
@@ -233,18 +235,14 @@ namespace mudpp
 
   room* game::find_room(int id)
   {
-    int zone_id = id / 1000;
-    int room_id = id % 1000;
-
-    auto z = zones_.find(zone_id);
+    auto z = zones_.find(id / 1000);
     if(z != zones_.end())
     {
-      return z->second.find_room(room_id);
+      return z->second.find_room(id);
     }
     else
     {
       return nullptr;
     }
   }
-
 }
