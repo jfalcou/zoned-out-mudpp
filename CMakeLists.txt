@@ -32,24 +32,22 @@ message( STATUS "[mupp] Building ${CMAKE_BUILD_TYPE} mode with: ${CMAKE_CXX_FLAG
 ## =================================================================================================
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads              REQUIRED        )
-find_package(Lua    "5.3"   EXACT REQUIRED        )
-find_package(Boost "1.71"         REQUIRED system )
+find_package(Lua    "5.3"         REQUIRED        )
+find_package(Boost "1.75"         REQUIRED system )
 
-include(download)
+include(FetchContent)
+FetchContent_Declare( sol
+                      GIT_REPOSITORY  https://github.com/ThePhD/sol2.git
+                      GIT_TAG develop
+                    )
 
-download_project( PROJ                sol
-                  GIT_REPOSITORY      https://github.com/ThePhD/sol2.git
-                  GIT_TAG             develop
-                  "UPDATE_DISCONNECTED 1"
-                  #QUIET
-                )
+FetchContent_Declare( tabulate
+                      GIT_REPOSITORY  https://github.com/p-ranav/tabulate.git
+                      GIT_TAG master
+                    )
 
-download_project( PROJ                tabulate
-                  GIT_REPOSITORY      https://github.com/p-ranav/tabulate.git
-                  GIT_TAG             master
-                  "UPDATE_DISCONNECTED 1"
-                  #QUIET
-                )
+FetchContent_MakeAvailable(sol)
+FetchContent_MakeAvailable(tabulate)
 
 set(MUPP_LIBRARIES ${LUA_LIBRARIES} ${Boost_LIBRARIES})
 

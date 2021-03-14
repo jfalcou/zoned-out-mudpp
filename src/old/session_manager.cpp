@@ -30,7 +30,7 @@ namespace mudpp
 
     // Whenever something happens, start the session and wait for acceptance again
     acceptor_.async_accept( sessions_.back()->socket()
-                          , [this](auto const& error) { sessions_.back()->start(); accept(); }
+                          , [this](auto const&) { sessions_.back()->start(); accept(); }
                           );
   }
 

@@ -101,7 +101,7 @@ namespace mudpp::detail
   // Who command
   // /who: List all the connected players and their locations
   //------------------------------------------------------------------------------------------------
-  void who(player* p, std::vector<std::string> const& args)
+  void who(player* p, std::vector<std::string> const&)
   {
     auto const& players = p->context().players();
 
@@ -229,7 +229,7 @@ namespace mudpp::detail
 
     ctx.broadcast( "@r#b[INFO]## #bThe server will now shutdown ...##\n\r");
     p->shutdown();
-  };
+  }
 
   //------------------------------------------------------------------------------------------------
   // Quit command

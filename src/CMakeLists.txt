@@ -6,32 +6,34 @@
 ##  SPDX-License-Identifier: MIT
 ##==================================================================================================
 
+##==================================================================================================
+## Gathering compiler options for libmudpp
+##==================================================================================================
 add_library ( mudpp SHARED
-              actions.cpp
-              command.cpp
-              create.cpp
-              exit.cpp
-              game.cpp
-              io.cpp
-              load.cpp
-              login.cpp
-              play.cpp
-              player.cpp
-              room.cpp
-              session.cpp
-              session_manager.cpp
-              zone.cpp
+              # actions.cpp
+              # command.cpp
+              # create.cpp
+              # exit.cpp
+              # game.cpp
+              # io.cpp
+              # load.cpp
+              # login.cpp
+              # play.cpp
+              # player.cpp
+              # room.cpp
+              # session.cpp
+              # session_manager.cpp
+              # zone.cpp
             )
-
-if( MSVC )
-  set( options /std:c++latest /W3 /EHsc)
-else()
-  set( options -std=c++17 -Wall -Wno-missing-braces -fvisibility=hidden)
-endif()
 
 add_library(mudpp::mudpp ALIAS mudpp)
 
-target_compile_options( mudpp PRIVATE ${options} )
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  target_compile_options( mudpp PUBLIC /W3 /EHsc /std:c++latest)
+else()
+  target_compile_options( mudpp PUBLIC -std=c++20 -Werror -Wall -Wpedantic -Wextra)
+endif()
+
 target_compile_definitions(mudpp PRIVATE MUDPP_API_EXPORTS=1)
 
 target_include_directories( mudpp

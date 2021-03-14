@@ -26,7 +26,7 @@ namespace mudpp
       auto period = std::chrono::milliseconds(p);
 
       // We use the 'self-recursive lambda' tricks to pass the lambda while reloading the timer
-      auto call = [this,period,callback](auto const& e, auto const& self)
+      auto call = [this,period,callback](auto const&, auto const& self) -> void
       {
         callback();
         timer.expires_at(timer.expiry() + period);
@@ -51,4 +51,3 @@ namespace mudpp
 }
 
 #endif
-
