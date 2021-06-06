@@ -6,4 +6,5 @@
 ##  SPDX-License-Identifier: MIT
 ##==================================================================================================
 
-add_demo( "mudpp" game.cpp )
+add_demo( "mudpp" server_test.cpp )
+add_demo( "mudpp" client_test.cpp )

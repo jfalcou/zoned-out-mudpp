@@ -10,6 +10,7 @@
 ## Gathering compiler options for libmudpp
 ##==================================================================================================
 add_library ( mudpp SHARED
+              dummy.cpp
               # actions.cpp
               # command.cpp
               # create.cpp
